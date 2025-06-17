@@ -12,10 +12,12 @@ import { FcmGateway } from "../notifications/fcm-gateway";
 import { ProximityVerificationNotifier } from "../notifications/proximity-verification-notifier";
 import { UserId } from "../../domain/user/user-id.value";
 import { Location } from "../../domain/shared/value-object/Location.value";
+import { SystemClock } from "../service/SystemClock";
 
 
 export const createHelpRequest = https.onCall(
   async (request) => {
+    logger.info("Received create help request call", { uid: request.auth?.uid, data: request.data });
     if(!request.auth) {
       logger.error("Unauthorized request");
       throw new https.HttpsError("unauthenticated", "Unauthorized request");
@@ -36,18 +38,16 @@ export const createHelpRequest = https.onCall(
       const requesterId = UserId.create(request.auth.uid);
       const input = CreateHelpRequestInputSchema.parse(request.data);
       const location = Location.create(input.location);
-      const currentTime = new Date();
+      const clock = SystemClock.create();
 
       const command = CreateHelpRequestCommand.create(
         requesterId,
         location,
-        currentTime
+        clock
       );
 
       const helpRequest = await usecase.execute(command);
       logger.info("Help request created successfully", { uid: request.auth.uid, helpRequestId: helpRequest.id });
-
-      return { id: helpRequest.id };
 
     } catch (error) {
 

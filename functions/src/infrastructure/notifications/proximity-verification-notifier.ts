@@ -1,3 +1,4 @@
+import { logger } from "firebase-functions";
 import { ProximityVerificationId } from "../../domain/help-request/proximity-verification-id.value";
 import { IProximityVerificationNotifier } from "../../domain/help-request/service/i-proximity-verification.notifier";
 import { UserId } from "../../domain/user/user-id.value";
@@ -25,7 +26,7 @@ export class ProximityVerificationNotifier implements IProximityVerificationNoti
     try {
       await this.gateway.sendNotification(targetUserId.value, data);
     } catch (error) {
-      console.error("Failed to send proximity verification notification:", error);
+      logger.error("Failed to send proximity verification notification:", error);
       throw new Error("Notification sending failed");
     }
   }

@@ -7,7 +7,8 @@ import { IProximityVerificationNotifier } from "./service/i-proximity-verificati
 import { Location } from "../shared/value-object/Location.value";
 
 import { z } from "zod";
-
+import { addSeconds } from "date-fns"; 
+import { IClock } from "../shared/service/i-clock.value";
 
 export const CreateHelpRequestInputSchema = z.object({
   location: LocationSchema,
@@ -20,15 +21,15 @@ export class CreateHelpRequestCommand {
   private constructor(
     public readonly requesterId: UserId,
     public readonly location: Location,
-    public readonly createdAt: Date,
+    public readonly clock: IClock,
   ) {}
 
   static create(
     requesterId: UserId,
     location: Location,
-    createdAt: Date
+    clock: IClock,
   ): CreateHelpRequestCommand {
-    return new CreateHelpRequestCommand(requesterId, location, createdAt);
+    return new CreateHelpRequestCommand(requesterId, location, clock);
   }
 }
 
@@ -36,7 +37,37 @@ export class CreateHelpRequestCommand {
 
 export class CreateHelpRequestUseCase {
   public async execute(command: CreateHelpRequestCommand): Promise<HelpRequest> {
-    throw new Error("Not implemented");
+    const { requesterId } = command;
+
+    const user = await this.userRepository.findById(requesterId);
+    if (!user) {
+      throw new Error(`User with ID ${requesterId.value} does not exist.`);
+    } 
+
+    const helpRequest = await this.helpRequestRepository.add(command);
+    if (!helpRequest) {
+      throw new Error("Failed to create help request.");
+    }
+
+    const nearbyUsers = await this.userRepository.findAvailableSupporters(
+      command.location,
+      1000 // 1000 meters radius
+    );
+
+    const proximityVerificationId = helpRequest.proximityVerificationId;
+    const expiredAt = addSeconds(command.clock.now(), 60);
+
+    if (nearbyUsers.length === 0) {
+      //TODO: 例外でなく通知送信の形で
+      throw new Error("No nearby users found to notify.");
+    }
+
+    await this.notifier.send(requesterId, proximityVerificationId, expiredAt);
+    for (const user of nearbyUsers) {
+      await this.notifier.send(user.id, proximityVerificationId, expiredAt);
+    }
+
+    return helpRequest;
   }
 
 
