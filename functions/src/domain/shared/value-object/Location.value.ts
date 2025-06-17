@@ -1,0 +1,32 @@
+import { z } from 'zod';
+import { geohashForLocation, geohashQueryBounds } from 'geofire-common';
+
+export const LocationSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
+type LocationProps = z.infer<typeof LocationSchema>;
+
+export class Location {
+  public readonly latitude: number;
+  public readonly longitude: number;
+
+  private constructor(props: LocationProps) {
+    this.latitude = props.latitude;
+    this.longitude = props.longitude;
+  }
+
+  public static create(props: LocationProps): Location {
+    const validatedProps = LocationSchema.parse(props);
+    return new Location(validatedProps);
+  }
+
+
+  public getGeohash(): string {
+    return geohashForLocation([this.latitude, this.longitude]);
+  }
+
+  public getQueryBounds(radiusInM: number): string[][] {
+    return geohashQueryBounds([this.latitude, this.longitude], radiusInM);
+  }
+}
