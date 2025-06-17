@@ -3,8 +3,8 @@ import * as FirebaseFirestore from '@google-cloud/firestore';
 import { HelpRequest } from '../../domain/help-request/help-request.entity';
 import { IHelpRequestRepository } from '../../domain/help-request/i-help-request.repository';
 import { HelpRequestId } from '../../domain/help-request/help-request-id.value';
-import { CreateHelpRequestInput } from '../../domain/help-request/create-help-request.shcema';
 import { User } from '../../domain/user/User.entity';
+import { CreateHelpRequestCommand } from '../../domain/help-request/create-help-request.usecase';
 
 export class HelpRequestRepository implements IHelpRequestRepository {
   private db: FirebaseFirestore.Firestore;
@@ -25,7 +25,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     throw new Error('Method not implemented.');
   }
 
-  async add(input: CreateHelpRequestInput, requester: User): Promise<HelpRequest> {
+  async add(command: CreateHelpRequestCommand): Promise<HelpRequest> {
     throw new Error('Method not implemented.');
   }
 }
