@@ -4,13 +4,14 @@ import { getFirestore } from "firebase-admin/firestore";
 
 import { z } from "zod";
 
-import { CreateHelpRequestInputSchema } from "../../domain/help-request/create-help-request.shcema";
-import { CreateHelpRequestUseCase } from "../../domain/help-request/create-help-request.usecase";
+import { CreateHelpRequestInputSchema } from "../../domain/help-request/create-help-request.usecase";
+import { CreateHelpRequestCommand, CreateHelpRequestUseCase } from "../../domain/help-request/create-help-request.usecase";
 import { HelpRequestRepository } from "../firestore/help-request.repository";
 import { UserRepository } from "../firestore/User.repository";
 import { FcmGateway } from "../notifications/fcm-gateway";
 import { ProximityVerificationNotifier } from "../notifications/proximity-verification-notifier";
 import { UserId } from "../../domain/user/user-id.value";
+import { Location } from "../../domain/shared/value-object/Location.value";
 
 
 export const createHelpRequest = https.onCall(
@@ -21,7 +22,6 @@ export const createHelpRequest = https.onCall(
     }
 
     try {
-      const input = CreateHelpRequestInputSchema.parse(request.data);
       const db = getFirestore();
       const helpRequestRepository = HelpRequestRepository.create(db);
       const userRepository = UserRepository.create(db);
@@ -34,10 +34,17 @@ export const createHelpRequest = https.onCall(
       );
 
       const requesterId = UserId.create(request.auth.uid);
+      const input = CreateHelpRequestInputSchema.parse(request.data);
+      const location = Location.create(input.location);
+      const currentTime = new Date();
 
-      const helpRequest = await usecase.execute({
-        ...input
-      }, requesterId);
+      const command = CreateHelpRequestCommand.create(
+        requesterId,
+        location,
+        currentTime
+      );
+
+      const helpRequest = await usecase.execute(command);
       logger.info("Help request created successfully", { uid: request.auth.uid, helpRequestId: helpRequest.id });
 
       return { id: helpRequest.id };

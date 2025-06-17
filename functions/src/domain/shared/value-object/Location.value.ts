@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { geohashForLocation, geohashQueryBounds } from 'geofire-common';
 
-const LocationSchema = z.object({
+export const LocationSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
 });
