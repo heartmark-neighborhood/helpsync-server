@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 
-const HelpRequestIdSchema = z
+export const HelpRequestIdSchema = z
   .string({
     invalid_type_error: 'ID must be a string.',
   })
