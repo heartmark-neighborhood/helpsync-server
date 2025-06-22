@@ -22,7 +22,7 @@ export class Location {
   }
 
 
-  public getGeohash(): string {
+  public calcGeohash(): string {
     return geohashForLocation([this.latitude, this.longitude]);
   }
 

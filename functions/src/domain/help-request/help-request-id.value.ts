@@ -13,7 +13,7 @@ const HelpRequestIdSchema = z
 
 export class HelpRequestId {
 
-  private constructor(private readonly value: string) {}
+  private constructor(readonly value: string) {}
 
   public static create(value: string): HelpRequestId {
     const validatedId = HelpRequestIdSchema.parse(value);
