@@ -19,7 +19,7 @@ export class User {
 
   static create(
     id: UserId, 
-    name: string = "hoge", 
+    nickname: string = "hoge", 
     role: 'supporter' | 'requester' = 'requester',
     email: string = "default@example.com", 
     iconUrl: string = "path/to/icon.jpg", 
@@ -27,6 +27,6 @@ export class User {
     clock: IClock = { now: () => new Date() }
   ): User {
     const now = clock.now();
-    return new User(id, name, email, role, true, Location.create({latitude: 0, longitude: 0}), iconUrl, physicalFeatures, now, now);
+    return new User(id, nickname, email, role, true, Location.create({latitude: 0, longitude: 0}), iconUrl, physicalFeatures, now, now);
   }
 }
