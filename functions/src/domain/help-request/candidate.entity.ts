@@ -57,7 +57,7 @@ export class Candidate {
     this._status = 'proximity-verification-failed';
   }
 
-  successProximityVerificationSucceeded(): void {
+  successProximityVerification(): void {
     if (this._status !== 'proximity-verification-requested') {
       throw new Error('Invalid state transition');
     }
