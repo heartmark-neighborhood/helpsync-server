@@ -1,4 +1,4 @@
-import { IClock } from "../../domain/shared/service/i-clock.value";
+import { IClock } from "../../domain/shared/service/i-clock.service";
 
 export class SystemClock implements IClock {
   private constructor() {}

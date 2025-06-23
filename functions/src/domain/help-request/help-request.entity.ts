@@ -5,9 +5,9 @@ import { Candidate } from "./candidate.entity";
 import { CandidatesCollection } from "./candidates.collection";
 import { HelpRequestId } from "./help-request-id.value";
 import { ProximityVerificationId } from "./proximity-verification-id.value";
-import { IClock } from "../shared/service/i-clock.value";
+import { IClock } from "../shared/service/i-clock.service";
 
-type HelpRequestStatus = 'SEARCHING' | 'WAITING_RESPONSE' | 'MATCHED' | 'COMPLETED' | 'FAILED' | 'CANCELED';
+type HelpRequestStatus = 'PENDING' | 'SEARCHING' | 'WAITING_RESPONSE' | 'MATCHED' | 'COMPLETED' | 'FAILED' | 'CANCELED';
 
 
 export class HelpRequest{
