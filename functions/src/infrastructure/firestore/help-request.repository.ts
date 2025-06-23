@@ -5,22 +5,30 @@ import { IHelpRequestRepository } from '../../domain/help-request/i-help-request
 import { HelpRequestId } from '../../domain/help-request/help-request-id.value';
 import { CreateHelpRequestCommand } from '../../domain/help-request/create-help-request.usecase';
 import { User } from '../../domain/user/User.entity';
+import { IClock } from '../../domain/shared/service/i-clock.service';
+import { UserId } from '../../domain/user/user-id.value';
+import { ProximityVerificationId } from '../../domain/help-request/proximity-verification-id.value';
+import { document } from 'firebase-functions/v1/firestore';
+import { CandidatesCollection } from '../../domain/help-request/candidates.collection';
 
 export class HelpRequestRepository implements IHelpRequestRepository {
   private db: FirebaseFirestore.Firestore;
+  private clock: IClock;
 
-  static create(db: FirebaseFirestore.Firestore): HelpRequestRepository {
-    return new HelpRequestRepository(db);
+  static create(db: FirebaseFirestore.Firestore, clock: IClock): HelpRequestRepository {
+    return new HelpRequestRepository(db, clock);
   }
 
-  private constructor(db: FirebaseFirestore.Firestore) {
+  private constructor(db: FirebaseFirestore.Firestore, clock: IClock) {
     this.db = db;
+    this.clock = clock;
   }
 
   async save(helpRequest: HelpRequest, requester: User): Promise<HelpRequest> {
     
-    const batch = this.db.batch();
+
     const helpRequestRef = this.db.collection('helpRequests').doc(helpRequest.id.value);
+    const batch = this.db.batch();
 
     const { status, location, createdAt, updatedAt } = helpRequest.toPersistenceModel();
     batch.set(helpRequestRef, {
@@ -49,11 +57,78 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     return helpRequest;
   }
 
+
   async findById(id: HelpRequestId): Promise<HelpRequest | null> {
-    throw new Error('Method not implemented.');
+    const helpRequestRef = this.db.collection('helpRequests').doc(id.value);
+    const doc = await helpRequestRef.get();
+
+    if (!doc.exists) return null;
+
+    const data = doc.data();
+    if (!data) return null;
+
+    const candidatesCollection = data.candidates ? data.candidates : [];
+    const candidates = candidatesCollection.map((c: any) => ({
+      candidateId: c.candidateId,
+      status: c.status
+    }));
+
+    return HelpRequest.create(
+      HelpRequestId.create(data.id),
+      data.proximityVerificationId,
+      UserId.create(data.requesterId),
+      data.status,
+      data.location,
+      data.createdAt.toDate(),
+      data.updatedAt.toDate(),
+      candidates,
+      this.clock
+    );
   }
 
   async add(command: CreateHelpRequestCommand): Promise<HelpRequest> {
-    throw new Error('Method not implemented.');
+
+
+    const helpRequestRef = this.db.collection('helpRequests').doc();
+    const batch = this.db.batch();
+
+    const requesterId = UserId.create(command.requesterId.value);
+    const proximityVerificationId = ProximityVerificationId.create();
+    const status = 'PENDING';
+    const location = command.location;
+    const createdAt = this.clock.now();
+    const updatedAt = this.clock.now();
+
+    const helpRequestObject = {
+      proximityVerificationId: proximityVerificationId.value,
+      requesterId: requesterId.value,
+      status,
+      location: {
+        ...location.toPersistenceModel(),
+        geohash: location.calcGeohash()
+      },
+      createdAt,
+      updatedAt,
+    };
+
+    batch.set(helpRequestRef, helpRequestObject);
+
+    await batch.commit();
+
+    const helpRequestId = HelpRequestId.create(helpRequestRef.id);
+    const candidatesCollection = CandidatesCollection.create();
+    const helpRequest = HelpRequest.create(
+      helpRequestId,
+      proximityVerificationId,
+      requesterId,
+      status,
+      location,
+      createdAt,
+      updatedAt,
+      candidatesCollection,
+      this.clock
+    );
+    
+    return helpRequest;
   }
 }
