@@ -103,6 +103,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     const updatedAt = this.clock.now();
 
     const helpRequestObject = {
+      id: helpRequestRef.id,
       proximityVerificationId: proximityVerificationId.value,
       requesterId: requesterId.value,
       status,
