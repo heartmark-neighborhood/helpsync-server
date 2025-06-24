@@ -1,4 +1,3 @@
-import { ca } from "date-fns/locale";
 import { Location } from "../shared/value-object/Location.value";
 import { UserId } from "../user/user-id.value";
 import { Candidate } from "./candidate.entity";
