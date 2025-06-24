@@ -30,7 +30,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     const helpRequestRef = this.db.collection('helpRequests').doc(helpRequest.id.value);
     const batch = this.db.batch();
 
-    const { status, location, createdAt, updatedAt } = helpRequest.toPersistenceModel();
+    const { status, location, createdAt, updatedAt, proximityVerificationId } = helpRequest.toPersistenceModel();
     batch.set(helpRequestRef, {
       id: helpRequest.id.value,
       requesterId: requester.id.value,
