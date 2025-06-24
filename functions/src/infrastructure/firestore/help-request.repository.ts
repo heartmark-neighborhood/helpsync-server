@@ -67,11 +67,14 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     const data = doc.data();
     if (!data) return null;
 
-    const candidatesCollection = data.candidates ? data.candidates : [];
-    const candidates = candidatesCollection.map((c: any) => ({
-      candidateId: c.candidateId,
-      status: c.status
-    }));
+    const candidatesSnapshot = await helpRequestRef.collection('candidates').get();
+    const candidates = candidatesSnapshot.docs.map((doc) => {
+      const candidateData = doc.data();
+      return {
+        candidateId: candidateData.candidateId,
+        status: candidateData.status,
+      };
+    });
 
     return HelpRequest.create(
       HelpRequestId.create(data.id),
