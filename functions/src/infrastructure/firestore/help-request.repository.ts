@@ -78,7 +78,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
 
     return HelpRequest.create(
       HelpRequestId.create(data.id),
-      data.proximityVerificationId,
+      ProximityVerificationId.create(data.proximityVerificationId),
       UserId.create(data.requesterId),
       data.status,
       data.location,
