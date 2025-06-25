@@ -20,8 +20,8 @@ export class User {
   static create(
     id: UserId, 
     nickname: string = "hoge", 
-    role: 'supporter' | 'requester' = 'requester',
     email: string = "default@example.com", 
+    role: 'supporter' | 'requester' = 'requester',
     iconUrl: string = "path/to/icon.jpg", 
     physicalFeatures: string = "黒いリュックサックを背負っています。",
     clock: IClock = { now: () => new Date() }
