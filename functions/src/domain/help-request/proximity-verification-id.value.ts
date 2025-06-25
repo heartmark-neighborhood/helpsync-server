@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 
-const ProximityVerificationIdSchema = z.string(
+export const ProximityVerificationIdSchema = z.string(
   {
     invalid_type_error: 'ID must be a string.',
   }

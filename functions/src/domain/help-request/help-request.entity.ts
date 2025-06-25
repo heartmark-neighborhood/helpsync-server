@@ -6,7 +6,26 @@ import { HelpRequestId } from "./help-request-id.value";
 import { ProximityVerificationId } from "./proximity-verification-id.value";
 import { IClock } from "../shared/service/i-clock.service";
 
-type HelpRequestStatus = 'PENDING' | 'SEARCHING' | 'WAITING_RESPONSE' | 'MATCHED' | 'COMPLETED' | 'FAILED' | 'CANCELED';
+import { z } from "zod";
+
+export const HelpRequestStatusSchema = z.enum([
+  'pending',
+  'searching',
+  'waiting_response',
+  'matched',
+  'completed',
+  'failed',
+  'canceled'
+], {
+  errorMap: (issue, ctx) => {
+    if (issue.code === 'invalid_enum_value') {
+      return { message: `Invalid help request status: ${ctx.data}` };
+    }
+    return { message: ctx.defaultError };
+  }
+});
+
+export type HelpRequestStatus = z.infer<typeof HelpRequestStatusSchema>;
 
 
 export class HelpRequest{
