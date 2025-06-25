@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "date-fns": "^4.1.0"
+    "@types/jest": "^30.0.0",
+    "date-fns": "^4.1.0",
+    "jest": "^30.0.3",
+    "ts-jest": "^29.4.0"
   }
 }
