@@ -10,9 +10,8 @@ export class CandidatesCollection {
     this.candidates = candidates;
   }
 
-  static create(): CandidatesCollection {
-    
-    return new CandidatesCollection();
+  static create(candidates: Candidate[] = []): CandidatesCollection {
+    return new CandidatesCollection(candidates);
   }
 
   add(candidate: Candidate): CandidatesCollection {

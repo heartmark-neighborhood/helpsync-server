@@ -8,8 +8,8 @@ import { User } from '../../domain/user/User.entity';
 import { IClock } from '../../domain/shared/service/i-clock.service';
 import { UserId } from '../../domain/user/user-id.value';
 import { ProximityVerificationId } from '../../domain/help-request/proximity-verification-id.value';
-import { document } from 'firebase-functions/v1/firestore';
 import { CandidatesCollection } from '../../domain/help-request/candidates.collection';
+import { Candidate } from '../../domain/help-request/candidate.entity';
 
 export class HelpRequestRepository implements IHelpRequestRepository {
   private db: FirebaseFirestore.Firestore;
@@ -34,6 +34,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     batch.set(helpRequestRef, {
       id: helpRequest.id.value,
       requesterId: requester.id.value,
+      proximityVerificationId,
       status,
       location: {
         latitude: location.latitude,
@@ -70,11 +71,12 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     const candidatesSnapshot = await helpRequestRef.collection('candidates').get();
     const candidates = candidatesSnapshot.docs.map((doc) => {
       const candidateData = doc.data();
-      return {
-        candidateId: candidateData.candidateId,
-        status: candidateData.status,
-      };
+      return  Candidate.fromPersistenceModel({
+        candidateId:  candidateData.candidateId,
+        status: candidateData.status
+      });
     });
+    const candidatesCollection = CandidatesCollection.create(candidates);
 
     return HelpRequest.create(
       HelpRequestId.create(data.id),
@@ -84,7 +86,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       data.location,
       data.createdAt.toDate(),
       data.updatedAt.toDate(),
-      candidates,
+      candidatesCollection,
       this.clock
     );
   }

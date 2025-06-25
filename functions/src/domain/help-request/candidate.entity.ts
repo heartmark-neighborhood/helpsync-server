@@ -1,5 +1,6 @@
 import { UserId } from "../user/user-id.value";
 import { z } from "zod";
+import { UserIdSchema } from "../user/user-id.value";
 
 const CandidateStatusSchema = z.enum([
   'pending',
@@ -20,6 +21,13 @@ const CandidateStatusSchema = z.enum([
 
 export type CandidateStatus = z.infer<typeof CandidateStatusSchema>;
 
+const CandidateSchema = z.object({
+  candidateId: UserIdSchema,
+  status: CandidateStatusSchema
+});
+
+export type CandidatePersistenceModel = z.infer<typeof CandidateSchema>;
+
 
 export class Candidate {
   private constructor(
@@ -32,12 +40,18 @@ export class Candidate {
     return new Candidate(candidateId, status);
   }
 
+  static fromPersistenceModel(model: CandidatePersistenceModel): Candidate {
+    const candidateId = UserId.create(model.candidateId);
+    const status = CandidateStatusSchema.parse(model.status); // Validate status
+    return new Candidate(candidateId, status);
+  }
+
   statusIs(status: CandidateStatus): boolean {
     CandidateStatusSchema.parse(status); // Validate status
     return this._status === status;
   }
 
-  toPersistenceModel(): { candidateId: string, status: CandidateStatus } {
+  toPersistenceModel():  CandidatePersistenceModel {
     return {
       candidateId: this.candidateId.value,
       status: this._status,
