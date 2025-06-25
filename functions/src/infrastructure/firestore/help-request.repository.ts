@@ -80,8 +80,6 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     if (!doc.exists) return null;
 
     const data = HelpRequestDocSchema.parse(doc.data());
-    if (!data) return null;
-
     const candidatesSnapshot = await helpRequestRef.collection('candidates').get();
     const candidates = candidatesSnapshot.docs.map((doc) => {
       const candidateData = doc.data();
