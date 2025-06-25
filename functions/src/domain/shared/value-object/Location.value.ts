@@ -22,11 +22,18 @@ export class Location {
   }
 
 
-  public getGeohash(): string {
+  public calcGeohash(): string {
     return geohashForLocation([this.latitude, this.longitude]);
   }
 
   public getQueryBounds(radiusInM: number): string[][] {
     return geohashQueryBounds([this.latitude, this.longitude], radiusInM);
+  }
+
+  public toPersistenceModel(): LocationProps {
+    return {
+      latitude: this.latitude,
+      longitude: this.longitude,
+    };
   }
 }

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 
-const HelpRequestIdSchema = z
+export const HelpRequestIdSchema = z
   .string({
     invalid_type_error: 'ID must be a string.',
   })
@@ -9,11 +9,12 @@ const HelpRequestIdSchema = z
     message: 'Invalid ID format. It must be a 20-character alphanumeric string.',
   });
 
+export type HelpRequestIdPersistenceModel = z.infer<typeof HelpRequestIdSchema>;
 
 
 export class HelpRequestId {
 
-  private constructor(private readonly value: string) {}
+  private constructor(readonly value: string) {}
 
   public static create(value: string): HelpRequestId {
     const validatedId = HelpRequestIdSchema.parse(value);

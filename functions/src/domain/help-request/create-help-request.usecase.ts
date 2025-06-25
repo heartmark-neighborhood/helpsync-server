@@ -8,7 +8,7 @@ import { Location } from "../shared/value-object/Location.value";
 
 import { z } from "zod";
 import { addSeconds } from "date-fns"; 
-import { IClock } from "../shared/service/i-clock.value";
+import { IClock } from "../shared/service/i-clock.service";
 
 export const CreateHelpRequestInputSchema = z.object({
   location: LocationSchema,
