@@ -4,6 +4,7 @@ import { HelpRequestId } from '../../src/domain/help-request/help-request-id.val
 import { CreateHelpRequestCommand } from '../../src/domain/help-request/create-help-request.usecase';
 import { ProximityVerificationId } from '../../src/domain/help-request/proximity-verification-id.value';
 import { CandidatesCollection } from '../../src/domain/help-request/candidates.collection';
+import { User } from '../../src/domain/user/User.entity';
 
 export class MemoryHelpRequestRepository implements IHelpRequestRepository {
   private helpRequests: HelpRequest[] = [];
@@ -13,7 +14,7 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
     // this.helpRequests.push(new HelpRequest(new HelpRequestId('1'), 'Sample request', new User('1', 'John Doe')));
   }
 
-  async save(helpRequest: HelpRequest): Promise<HelpRequest> {
+  async save(helpRequest: HelpRequest, requester: User): Promise<HelpRequest> {
     const index = this.helpRequests.findIndex(hr => hr.id.equals(helpRequest.id));
     if (index !== -1) {
       this.helpRequests[index] = helpRequest;
