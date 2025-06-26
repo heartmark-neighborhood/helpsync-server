@@ -7,9 +7,21 @@ import { TestClock } from '../../../__test__/fake/test-clock.service';
 import { IProximityVerificationNotifier } from './service/i-proximity-verification.notifier';
 import { ProximityVerificationId } from './proximity-verification-id.value';
 import { Location } from '../shared/value-object/Location.value';
+import { IProximityVerificationTimeoutScheduler } from './service/i-proximity-verfication-timeout.scheduler';
+import { HelpRequestId } from './help-request-id.value';
 
 class DummyNotifier implements IProximityVerificationNotifier {
   async send(targetUserId: UserId, proximityVerificationId: ProximityVerificationId, expiredAt: Date): Promise<void> {
+    // Dummy implementation
+  }
+}
+
+class DummyScheduler implements IProximityVerificationTimeoutScheduler {
+  async schedule(helpRequestId: HelpRequestId, timeoutAt: Date): Promise<void> {
+    // Dummy implementation
+  }
+
+  async cancel(helpRequestId: HelpRequestId): Promise<void> {
     // Dummy implementation
   }
 }
@@ -19,17 +31,19 @@ describe('ヘルプ要請作成要求', () => {
     const userRepository = new MemoryUserRepository();
     const helpRequestRepository = new MemoryHelpRequestRepository();
     const notifier = new DummyNotifier();
+    const scheduler = new DummyScheduler();
 
     const usecase = CreateHelpRequestUseCase.create(
       helpRequestRepository,
       userRepository,
-      notifier
+      notifier,
+      scheduler
     );
 
     const command = CreateHelpRequestCommand.create(
       UserId.create('requester-id'),
-      Location.create({ latitude: 35.6895, longitude: 139.6917 }), // 東京の座標
-      new TestClock(),
+      Location.create({ latitude: 35.6895, longitude: 139.6917 }), // 東京の座標,
+      new TestClock()
     );
 
     const helpRequest = await usecase.execute(command);

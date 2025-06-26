@@ -13,6 +13,7 @@ import { ProximityVerificationNotifier } from "../notifications/proximity-verifi
 import { UserId } from "../../domain/user/user-id.value";
 import { Location } from "../../domain/shared/value-object/Location.value";
 import { SystemClock } from "../service/SystemClock";
+import { ProximityVerificationTimeoutScheduler } from "../cloudtasks/ProximityVerificationTimeout.scheduler";
 
 
 export const createHelpRequest = https.onCall(
@@ -25,20 +26,22 @@ export const createHelpRequest = https.onCall(
 
     try {
       const db = getFirestore();
-      const helpRequestRepository = HelpRequestRepository.create(db);
+      const clock = SystemClock.create();
+      const helpRequestRepository = HelpRequestRepository.create(db, clock);
       const userRepository = UserRepository.create(db);
       const notifier = ProximityVerificationNotifier.create(FcmGateway.create());
+      const scheduler = ProximityVerificationTimeoutScheduler.create();
 
       const usecase = CreateHelpRequestUseCase.create(
         helpRequestRepository,
         userRepository,
-        notifier
+        notifier,
+        scheduler,
       );
 
-      const requesterId = UserId.create(request.auth.uid);
       const input = CreateHelpRequestInputSchema.parse(request.data);
+      const requesterId = UserId.create(request.auth.uid);
       const location = Location.create(input.location);
-      const clock = SystemClock.create();
 
       const command = CreateHelpRequestCommand.create(
         requesterId,

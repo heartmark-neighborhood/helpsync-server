@@ -11,6 +11,7 @@ import { addSeconds } from "date-fns";
 import { IClock } from "../shared/service/i-clock.service";
 import { CandidatesCollection } from "./candidates.collection";
 import { Candidate } from "./candidate.entity";
+import { IProximityVerificationTimeoutScheduler } from "./service/i-proximity-verfication-timeout.scheduler";
 
 export const CreateHelpRequestInputSchema = z.object({
   location: LocationSchema,
@@ -75,6 +76,11 @@ export class CreateHelpRequestUseCase {
       await this.notifier.send(user.id, proximityVerificationId, expiredAt);
     }
 
+    await this.scheduler.schedule(
+      addedHelpRequest.id,
+      expiredAt
+    );
+
     const requestedHelpRequest = addedHelpRequest.requestedProximityVerification();
     this.helpRequestRepository.save(requestedHelpRequest, requester);
 
@@ -85,18 +91,21 @@ export class CreateHelpRequestUseCase {
   private constructor(
     private readonly helpRequestRepository: IHelpRequestRepository,
     private readonly userRepository: IUserRepository,
-    private readonly notifier: IProximityVerificationNotifier
+    private readonly notifier: IProximityVerificationNotifier,
+    private readonly scheduler: IProximityVerificationTimeoutScheduler
   ) {}
 
   static create(
     helpRequestRepository: IHelpRequestRepository,
     userRepository: IUserRepository,
-    notifier: IProximityVerificationNotifier
+    notifier: IProximityVerificationNotifier,
+    scheduler: IProximityVerificationTimeoutScheduler
   ): CreateHelpRequestUseCase {
     return new CreateHelpRequestUseCase(
       helpRequestRepository,
       userRepository,
-      notifier
+      notifier,
+      scheduler
     );
   }
 }
