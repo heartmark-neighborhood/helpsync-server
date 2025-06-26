@@ -13,7 +13,7 @@ import { ProximityVerificationNotifier } from "../notifications/proximity-verifi
 import { UserId } from "../../domain/user/user-id.value";
 import { Location } from "../../domain/shared/value-object/Location.value";
 import { SystemClock } from "../service/SystemClock";
-import { ProximityVerificationTimeoutScheduler } from "../cloudtasks/ProximityVerificationTimeout.scheduler";
+import { ProximityVerificationTimeoutScheduler } from "../cloudtasks/proximity-verification-timeout.scheduler";
 
 
 export const createHelpRequest = https.onCall(
