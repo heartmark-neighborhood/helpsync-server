@@ -1,6 +1,5 @@
 import { Location } from "../shared/value-object/Location.value";
 import { UserId } from "../user/user-id.value";
-import { Candidate } from "./candidate.entity";
 import { CandidatesCollection } from "./candidates.collection";
 import { HelpRequestId } from "./help-request-id.value";
 import { ProximityVerificationId } from "./proximity-verification-id.value";
@@ -65,9 +64,8 @@ export class HelpRequest{
     );
   }
 
-  addCandidate(candidateId: UserId): HelpRequest {
-    const candidate = Candidate.create(candidateId, 'pending');
-    const updatedCandidates = this.candidatesCollection.add(candidate);
+  addCandidates(candidates: CandidatesCollection): HelpRequest {
+    const updatedCandidates = this.candidatesCollection.addAll(candidates);
     return new HelpRequest(
       this.id,
       this.proximityVerificationId,
@@ -77,6 +75,31 @@ export class HelpRequest{
       this.createdAt,
       this.clock.now(),
       updatedCandidates,
+      this.clock
+    );
+  }
+
+  requestedProximityVerification(): HelpRequest {
+    if (this.status !== 'pending') {
+      throw new Error('Invalid state transition');
+    }
+
+    const updatedCandidates = this.candidatesCollection.all.map(candidate => {
+      if (candidate.statusIs('pending')) {
+        candidate.requestProximityVerification();
+      }
+      return candidate;
+    });
+    const newCandidatesCollection = CandidatesCollection.create(updatedCandidates);
+    return new HelpRequest(
+      this.id,
+      this.proximityVerificationId,
+      this.requesterId,
+      'searching',
+      this.location,
+      this.createdAt,
+      this.clock.now(),
+      newCandidatesCollection,
       this.clock
     );
   }

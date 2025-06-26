@@ -14,15 +14,11 @@ export class UserRepository implements IUserRepository {
     this.db = db;
   }
 
-  async save(user: User): Promise<void> {
+  async save(user: User): Promise<User> {
     throw new Error("Method not implemented.");
   }
 
   async findById(id: UserId): Promise<User | null> {
-    throw new Error("Method not implemented.");
-  }
-
-  async findByEmail(email: string): Promise<User | null> {
     throw new Error("Method not implemented.");
   }
 

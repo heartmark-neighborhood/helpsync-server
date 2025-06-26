@@ -16,11 +16,18 @@ export class HelpRequestId {
 
   private constructor(readonly value: string) {}
 
-  public static create(value: string): HelpRequestId {
+  public static create(value: string = HelpRequestId.generateId()): HelpRequestId {
     const validatedId = HelpRequestIdSchema.parse(value);
     return new HelpRequestId(validatedId);
   }
-  
+
+  private static generateId(): string {
+    return 'xxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, () => {
+      const random = Math.floor(Math.random() * 16);
+      return random.toString(16);
+    });
+  }
+
   public equals(other: HelpRequestId): boolean {
     return this.value === other.value;
   }

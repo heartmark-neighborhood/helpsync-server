@@ -9,6 +9,8 @@ import { Location } from "../shared/value-object/Location.value";
 import { z } from "zod";
 import { addSeconds } from "date-fns"; 
 import { IClock } from "../shared/service/i-clock.service";
+import { CandidatesCollection } from "./candidates.collection";
+import { Candidate } from "./candidate.entity";
 
 export const CreateHelpRequestInputSchema = z.object({
   location: LocationSchema,
@@ -39,8 +41,8 @@ export class CreateHelpRequestUseCase {
   public async execute(command: CreateHelpRequestCommand): Promise<HelpRequest> {
     const { requesterId } = command;
 
-    const user = await this.userRepository.findById(requesterId);
-    if (!user) {
+    const requester = await this.userRepository.findById(requesterId);
+    if (!requester) {
       throw new Error(`User with ID ${requesterId.value} does not exist.`);
     } 
 
@@ -54,20 +56,29 @@ export class CreateHelpRequestUseCase {
       1000 // 1000 meters radius
     );
 
-    const proximityVerificationId = helpRequest.proximityVerificationId;
-    const expiredAt = addSeconds(command.clock.now(), 60);
-
     if (nearbyUsers.length === 0) {
       //TODO: 例外でなく通知送信の形で
       throw new Error("No nearby users found to notify.");
     }
+
+    const candidateUserIds =  nearbyUsers.map(user => user.id);
+    const candidates = CandidatesCollection.create(
+      candidateUserIds.map(userId => Candidate.create(userId,))
+    );
+    const addedHelpRequest = helpRequest.addCandidates(candidates);
+
+    const proximityVerificationId = addedHelpRequest.proximityVerificationId;
+    const expiredAt = addSeconds(command.clock.now(), 60); // 60 seconds expiration
 
     await this.notifier.send(requesterId, proximityVerificationId, expiredAt);
     for (const user of nearbyUsers) {
       await this.notifier.send(user.id, proximityVerificationId, expiredAt);
     }
 
-    return helpRequest;
+    const requestedHelpRequest = addedHelpRequest.requestedProximityVerification();
+    this.helpRequestRepository.save(requestedHelpRequest, requester);
+
+    return requestedHelpRequest;
   }
 
 

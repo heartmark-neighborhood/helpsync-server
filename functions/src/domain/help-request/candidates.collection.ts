@@ -14,12 +14,11 @@ export class CandidatesCollection {
     return new CandidatesCollection(candidates);
   }
 
-  add(candidate: Candidate): CandidatesCollection {
-    if (this.exists(candidate.candidateId)) {
-      throw new Error(`Candidate with ID ${candidate.candidateId.value} already exists.`);
-    }
-
-    return new CandidatesCollection([...this.candidates, candidate]);
+  addAll(candidates: CandidatesCollection): CandidatesCollection {
+    const newCandidates = candidates.all.filter(
+      (candidate) => !this.exists(candidate.candidateId)
+    );
+    return new CandidatesCollection([...this.candidates, ...newCandidates]);
   }
 
   exists(candidateId: UserId): boolean {
