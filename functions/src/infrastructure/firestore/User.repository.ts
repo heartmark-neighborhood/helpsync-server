@@ -14,7 +14,7 @@ export class UserRepository implements IUserRepository {
     this.db = db;
   }
 
-  async save(user: User): Promise<void> {
+  async save(user: User): Promise<User> {
     throw new Error("Method not implemented.");
   }
 
