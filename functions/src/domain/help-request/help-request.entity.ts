@@ -85,7 +85,7 @@ export class HelpRequest{
     }
 
     const updatedCandidates = this.candidatesCollection.all.map(candidate => {
-      if (candidate.statusIs('proximity-verification-requested')) {
+      if (candidate.statusIs('pending')) {
         candidate.requestProximityVerification();
       }
       return candidate;
