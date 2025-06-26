@@ -32,10 +32,10 @@ export type CandidatePersistenceModel = z.infer<typeof CandidateSchema>;
 export class Candidate {
   private constructor(
     readonly candidateId: UserId,
-    private _status: CandidateStatus = 'pending'
+    private _status: CandidateStatus
   ) {}
 
-  static create(candidateId: UserId, status: CandidateStatus): Candidate {
+  static create(candidateId: UserId, status: CandidateStatus = 'pending'): Candidate {
     CandidateStatusSchema.parse(status); // Validate status
     return new Candidate(candidateId, status);
   }

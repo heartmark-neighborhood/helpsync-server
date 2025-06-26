@@ -24,9 +24,10 @@ export class User {
     role: 'supporter' | 'requester' = 'requester',
     iconUrl: string = "path/to/icon.jpg", 
     physicalFeatures: string = "黒いリュックサックを背負っています。",
+    location: Location = Location.create({latitude: 0, longitude: 0}),
     clock: IClock = { now: () => new Date() }
   ): User {
     const now = clock.now();
-    return new User(id, nickname, email, role, true, Location.create({latitude: 0, longitude: 0}), iconUrl, physicalFeatures, now, now);
+    return new User(id, nickname, email, role, true, location, iconUrl, physicalFeatures, now, now);
   }
 }
