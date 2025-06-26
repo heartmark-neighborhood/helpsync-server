@@ -46,7 +46,9 @@ describe('ヘルプ要請作成要求', () => {
     expect(helpRequest.candidatesCollection).toBeDefined();
     expect(candidates.length).toBe(2);
     expect(candidates[0].candidateId.value).toBe('supporter1-id');
+    expect(candidates[0].statusIs("proximity-verification-requested")).toBe(true);
     expect(candidates[1].candidateId.value).toBe('supporter2-id');
+    expect(candidates[1].statusIs("proximity-verification-requested")).toBe(true);
 
     expect(helpRequest.proximityVerificationId).toBeDefined();
     expect(helpRequest.proximityVerificationId.value).toBeDefined();
