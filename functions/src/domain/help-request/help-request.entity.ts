@@ -65,7 +65,7 @@ export class HelpRequest{
   }
 
   addCandidates(candidates: CandidatesCollection): HelpRequest {
-    const updatedCandidates = this.candidatesCollection.add(candidates);
+    const updatedCandidates = this.candidatesCollection.addAll(candidates);
     return new HelpRequest(
       this.id,
       this.proximityVerificationId,

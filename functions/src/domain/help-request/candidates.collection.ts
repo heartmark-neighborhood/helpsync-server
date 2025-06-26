@@ -14,7 +14,7 @@ export class CandidatesCollection {
     return new CandidatesCollection(candidates);
   }
 
-  add(candidates: CandidatesCollection): CandidatesCollection {
+  addAll(candidates: CandidatesCollection): CandidatesCollection {
     const newCandidates = candidates.all.filter(
       (candidate) => !this.exists(candidate.candidateId)
     );
