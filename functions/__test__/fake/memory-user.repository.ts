@@ -13,7 +13,6 @@ export class MemoryUserRepository implements IUserRepository {
     'requester',
     'path/to/requester/icon.jpg',
     '黒いリュックサックを背負っています。',
-    Location.create({latitude: 34, longitude: -135}),
     new TestClock()
   );
 
@@ -24,7 +23,6 @@ export class MemoryUserRepository implements IUserRepository {
     'supporter',
     'path/to/supporter1/icon.jpg',
     '白い帽子をかぶっています。',
-    Location.create({latitude: 34, longitude: -135}),
     new TestClock()
   );
 
@@ -35,7 +33,6 @@ export class MemoryUserRepository implements IUserRepository {
     'supporter',
     'path/to/supporter2/icon.jpg',
     '黄色いTシャツを着ています。',
-    Location.create({latitude: 34, longitude: -135}),
     new TestClock()
   );
 
