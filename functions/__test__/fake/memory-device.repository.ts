@@ -23,29 +23,46 @@ export class MemoryDeviceRepository implements IDeviceRepository {
     this.testClock
   );
 
-  private supporter1Device = Device.create(
-    DeviceId.create('supporter1-device-id'),
+  private supporter1Device1 = Device.create(
+    DeviceId.create('supporter1-device1-id'),
     UserId.create('supporter1-id'),
     DeviceToken.create('supporter1-device-token'),
     Location.create({ latitude: 35.6895, longitude: 139.6917 }), // Tokyo
-    this.testClock.now(),
+    new Date(2023, 10, 1, 12, 0, 0), // Example date
     this.testClock
   );
-
-  private supporter2Device = Device.create(
-    DeviceId.create('supporter2-device-id'),
+  private supporter1Device2 = Device.create(
+    DeviceId.create('supporter1-device2-id'),
+    UserId.create('supporter1-id'),
+    DeviceToken.create('supporter1-device-token'),
+    Location.create({ latitude: 35.6895, longitude: 139.6917 }), // Tokyo
+    new Date(2023, 10, 1, 11, 0, 0), // Example date
+    this.testClock
+  );
+  private supporter1Device3 = Device.create(
+    DeviceId.create('supporter1-device3-id'),
+    UserId.create('supporter1-id'),
+    DeviceToken.create('supporter1-device-token'),
+    Location.create({ latitude: 35.6895, longitude: 139.6917 }), // Tokyo
+    new Date(2023, 10, 1, 10, 0, 0), // Example date
+    this.testClock
+  );
+  private supporter2Device1 = Device.create(
+    DeviceId.create('supporter2-device1-id'),
     UserId.create('supporter2-id'),
     DeviceToken.create('supporter2-device-token'),
     Location.create({ latitude: 35.6895, longitude: 139.6917 }), // Tokyo
-    this.testClock.now(),
+    new Date(2023, 10, 1, 12, 0, 0), // Example date
     this.testClock
   );
 
   constructor() {
     // Initialize with some dummy devices
     this.devices.push(this.requesterDevice);
-    this.devices.push(this.supporter1Device);
-    this.devices.push(this.supporter2Device);
+    this.devices.push(this.supporter1Device1);
+    this.devices.push(this.supporter1Device2);
+    this.devices.push(this.supporter1Device3);
+    this.devices.push(this.supporter2Device1);
   }
 
   async save(device: Device): Promise<Device> {
@@ -60,8 +77,10 @@ export class MemoryDeviceRepository implements IDeviceRepository {
 
   async findAvailableNearBy(): Promise<DevicesCollection> {
     return DevicesCollection.create([
-      this.supporter1Device,
-      this.supporter2Device
+      this.supporter1Device1,
+      this.supporter1Device2,
+      this.supporter1Device3,
+      this.supporter2Device1,
     ]);
   }
 
