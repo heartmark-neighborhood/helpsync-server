@@ -1,8 +1,9 @@
 import { IHelpRequestNotifier } from "../../domain/help-request/service/i-help-request.notifier";
-import { UserId } from "../../domain/user/user-id.value";import { logger } from "firebase-functions";
 import { RequesterProfileDto } from "../../domain/help-request/requester-profile.dto";
 
 import { FcmGateway } from "./fcm-gateway";
+import { DeviceId } from "../../domain/device/device-id.value";
+import { logger } from "firebase-functions";
 
 
 class HelpRequestNotifier implements IHelpRequestNotifier {
@@ -16,7 +17,7 @@ class HelpRequestNotifier implements IHelpRequestNotifier {
     this.gateway = gateway;
   }
 
-  async send(targetUserId: UserId, requesterProfile: RequesterProfileDto): Promise<void> {
+  async send(targetDeviceId: DeviceId, requesterProfile: RequesterProfileDto): Promise<void> {
     const data = {
       nickname: requesterProfile.nickname,
       iconUrl: requesterProfile.iconUrl,
@@ -24,7 +25,7 @@ class HelpRequestNotifier implements IHelpRequestNotifier {
     }
 
     try {
-      await this.gateway.sendNotification(targetUserId.value, data);
+      await this.gateway.sendNotification(targetDeviceId, data);
     } catch (error) {
       logger.error("Failed to send help request notification:", error);
       throw new Error("Notification sending failed");
