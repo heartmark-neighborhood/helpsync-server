@@ -1,5 +1,4 @@
 import { IClock } from "../shared/service/i-clock.service";
-import { Location } from "../shared/value-object/Location.value";
 import { UserId } from "./user-id.value";
 
 export class User {
@@ -9,7 +8,6 @@ export class User {
     readonly email: string,
     readonly role: 'supporter' | 'requester' = 'requester',
     readonly isAvailableForHelp: boolean = true,
-    readonly location: Location = Location.create({latitude: 0, longitude: 0}), // Default location
     readonly iconUrl: string = "path/to/icon.jpg",
     readonly physicalFeatures: string = "黒いリュックサックを背負っています。",
 
@@ -24,10 +22,9 @@ export class User {
     role: 'supporter' | 'requester' = 'requester',
     iconUrl: string = "path/to/icon.jpg", 
     physicalFeatures: string = "黒いリュックサックを背負っています。",
-    location: Location = Location.create({latitude: 0, longitude: 0}),
     clock: IClock = { now: () => new Date() }
   ): User {
     const now = clock.now();
-    return new User(id, nickname, email, role, true, location, iconUrl, physicalFeatures, now, now);
+    return new User(id, nickname, email, role, true, iconUrl, physicalFeatures, now, now);
   }
 }

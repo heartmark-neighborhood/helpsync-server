@@ -104,6 +104,31 @@ export class HelpRequest{
     );
   }
 
+  timeoutProximityVerification(): HelpRequest {
+    if (this.status !== 'searching') {
+      throw new Error('Invalid state transition');
+    }
+
+    const updatedCandidates = this.candidatesCollection.all.map(candidate => {
+      if (candidate.statusIs('pending')) {
+        candidate.failProximityVerification();
+      }
+      return candidate;
+    });
+    const newCandidatesCollection = CandidatesCollection.create(updatedCandidates);
+    return new HelpRequest(
+      this.id,
+      this.proximityVerificationId,
+      this.requesterId,
+      'waiting_response',
+      this.location,
+      this.createdAt,
+      this.clock.now(),
+      newCandidatesCollection,
+      this.clock
+    );
+  }
+
   toPersistenceModel() {
     return {
       id: this.id.value,

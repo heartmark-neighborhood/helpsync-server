@@ -7,14 +7,17 @@ import { IProximityVerificationNotifier } from "./service/i-proximity-verificati
 import { Location } from "../shared/value-object/Location.value";
 
 import { z } from "zod";
-import { addSeconds } from "date-fns"; 
+import { addMinutes } from "date-fns"; 
 import { IClock } from "../shared/service/i-clock.service";
 import { CandidatesCollection } from "./candidates.collection";
 import { Candidate } from "./candidate.entity";
 import { IProximityVerificationTimeoutScheduler } from "./service/i-proximity-verfication-timeout.scheduler";
+import { IDeviceRepository } from "../device/i-device.repository";
+import { DeviceId, DeviceIdSchema } from "../device/device-id.value";
 
 export const CreateHelpRequestInputSchema = z.object({
   location: LocationSchema,
+  deviceId: DeviceIdSchema
 }).strict();
 
 
@@ -24,15 +27,17 @@ export class CreateHelpRequestCommand {
   private constructor(
     public readonly requesterId: UserId,
     public readonly location: Location,
+    public readonly deviceId: DeviceId,
     public readonly clock: IClock,
   ) {}
 
   static create(
     requesterId: UserId,
     location: Location,
+    deviceId: DeviceId,
     clock: IClock,
   ): CreateHelpRequestCommand {
-    return new CreateHelpRequestCommand(requesterId, location, clock);
+    return new CreateHelpRequestCommand(requesterId, location, deviceId, clock);
   }
 }
 
@@ -52,28 +57,33 @@ export class CreateHelpRequestUseCase {
       throw new Error("Failed to create help request.");
     }
 
-    const nearbyUsers = await this.userRepository.findAvailableSupporters(
+    const nearByDevice = await this.deviceRepository.findAvailableNearBy(
       command.location,
       1000 // 1000 meters radius
     );
-
-    if (nearbyUsers.length === 0) {
-      //TODO: 例外でなく通知送信の形で
-      throw new Error("No nearby users found to notify.");
+    if (nearByDevice.length === 0) {
+      throw new Error("No nearby devices found.");
     }
 
-    const candidateUserIds =  nearbyUsers.map(user => user.id);
-    const candidates = CandidatesCollection.create(
-      candidateUserIds.map(userId => Candidate.create(userId,))
-    );
+    const nearByDeviceUniqueLatest = nearByDevice.toUniqueLatest();
+    let candidates = CandidatesCollection.create();
+    nearByDeviceUniqueLatest.all.forEach(device => {
+      candidates = candidates.add(Candidate.create(device.ownerId));
+    });
+
+    const requesterDevice = await this.deviceRepository.findById(command.deviceId);
+    if (!requesterDevice) {
+      throw new Error(`Device with ID ${command.deviceId.value} does not exist.`);
+    }
+    const deviceToNotify = [...nearByDeviceUniqueLatest.all, requesterDevice];
+
     const addedHelpRequest = helpRequest.addCandidates(candidates);
 
     const proximityVerificationId = addedHelpRequest.proximityVerificationId;
-    const expiredAt = addSeconds(command.clock.now(), 60); // 60 seconds expiration
+    const expiredAt = addMinutes(command.clock.now(), 1); // 1 minute expiration
 
-    await this.notifier.send(requesterId, proximityVerificationId, expiredAt);
-    for (const user of nearbyUsers) {
-      await this.notifier.send(user.id, proximityVerificationId, expiredAt);
+    for (const device of deviceToNotify) {
+      this.notifier.send(device, proximityVerificationId, expiredAt);
     }
 
     await this.scheduler.schedule(
@@ -91,6 +101,7 @@ export class CreateHelpRequestUseCase {
   private constructor(
     private readonly helpRequestRepository: IHelpRequestRepository,
     private readonly userRepository: IUserRepository,
+    private readonly deviceRepository: IDeviceRepository,
     private readonly notifier: IProximityVerificationNotifier,
     private readonly scheduler: IProximityVerificationTimeoutScheduler
   ) {}
@@ -98,12 +109,14 @@ export class CreateHelpRequestUseCase {
   static create(
     helpRequestRepository: IHelpRequestRepository,
     userRepository: IUserRepository,
+    deviceRepository: IDeviceRepository,
     notifier: IProximityVerificationNotifier,
     scheduler: IProximityVerificationTimeoutScheduler
   ): CreateHelpRequestUseCase {
     return new CreateHelpRequestUseCase(
       helpRequestRepository,
       userRepository,
+      deviceRepository,
       notifier,
       scheduler
     );
