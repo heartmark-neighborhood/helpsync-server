@@ -1,7 +1,11 @@
 import { UserId } from "../user/user-id.value";
-import { Candidate } from "./candidate.entity";
+import { Candidate, CandidateSchema } from "./candidate.entity";
 import { CandidateStatus } from "./candidate.entity";
 
+import { z } from "zod";
+
+export const CandidatesCollectionSchema = z.array(CandidateSchema);
+export type CandidatesCollectionProps = z.infer<typeof CandidatesCollectionSchema>;
 
 export class CandidatesCollection {
   private readonly candidates: Candidate[] = [];
@@ -39,7 +43,21 @@ export class CandidatesCollection {
     return filtered[randomIndex];
   }
 
-  toPersistenceModel() {
+  timeoutProximityVerification(): CandidatesCollection {
+    const updatedCandidates = this.candidates.map((candidate) => {
+      if (candidate.statusIs('proximity-verification-requested')) {
+        candidate.failProximityVerification();
+      }
+      return candidate;
+    });
+    return CandidatesCollection.create(updatedCandidates);
+  }
+
+  existsByStatus(status: CandidateStatus): boolean {
+    return this.candidates.some((candidate) => candidate.statusIs(status));
+  }
+
+  toPersistenceModel(): CandidatesCollectionProps {
     return this.candidates.map((candidate) => candidate.toPersistenceModel());
 
   }

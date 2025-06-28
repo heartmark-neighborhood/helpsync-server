@@ -83,9 +83,9 @@ export class DeviceRepository implements IDeviceRepository {
 
       if (distanceInM <= radiusInM) {
         finalResults.add(Device.create(
-          DeviceToken.create(id), 
+          DeviceId.create(id),
           UserId.create(data.ownerId),
-          data.fcmToken,
+          DeviceToken.create(data.fcmToken),
           Location.create({ latitude: docLocation.latitude, longitude: docLocation.longitude }),
           new Date(data.lastUpdatedAt),
           this.clock

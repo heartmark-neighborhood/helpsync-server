@@ -1,6 +1,7 @@
 import { UserId } from "../user/user-id.value";
 import { z } from "zod";
 import { UserIdSchema } from "../user/user-id.value";
+import { DeviceId, DeviceIdSchema } from "../device/device-id.value";
 
 const CandidateStatusSchema = z.enum([
   'pending',
@@ -21,9 +22,10 @@ const CandidateStatusSchema = z.enum([
 
 export type CandidateStatus = z.infer<typeof CandidateStatusSchema>;
 
-const CandidateSchema = z.object({
+export const CandidateSchema = z.object({
   candidateId: UserIdSchema,
-  status: CandidateStatusSchema
+  status: CandidateStatusSchema,
+  notifiedDeviceId: DeviceIdSchema
 });
 
 export type CandidatePersistenceModel = z.infer<typeof CandidateSchema>;
@@ -32,18 +34,20 @@ export type CandidatePersistenceModel = z.infer<typeof CandidateSchema>;
 export class Candidate {
   private constructor(
     readonly candidateId: UserId,
-    private _status: CandidateStatus
+    private _notifiedDeviceId: DeviceId,
+    private _status: CandidateStatus,
   ) {}
 
-  static create(candidateId: UserId, status: CandidateStatus = 'pending'): Candidate {
+  static create(candidateId: UserId, notifiedDeviceId: DeviceId, status: CandidateStatus = 'pending'): Candidate {
     CandidateStatusSchema.parse(status); // Validate status
-    return new Candidate(candidateId, status);
+    return new Candidate(candidateId, notifiedDeviceId, status);
   }
 
   static fromPersistenceModel(model: CandidatePersistenceModel): Candidate {
     const candidateId = UserId.create(model.candidateId);
+    const notifiedDeviceId = DeviceId.create(model.notifiedDeviceId);
     const status = CandidateStatusSchema.parse(model.status); // Validate status
-    return new Candidate(candidateId, status);
+    return new Candidate(candidateId, notifiedDeviceId, status);
   }
 
   statusIs(status: CandidateStatus): boolean {
@@ -54,6 +58,7 @@ export class Candidate {
   toPersistenceModel():  CandidatePersistenceModel {
     return {
       candidateId: this.candidateId.value,
+      notifiedDeviceId: this._notifiedDeviceId.value,
       status: this._status,
     };
   }

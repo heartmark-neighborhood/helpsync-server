@@ -51,8 +51,18 @@ export class CreateHelpRequestUseCase {
     if (!requester) {
       throw new Error(`User with ID ${requesterId.value} does not exist.`);
     } 
+    if (!command.location) {
+      throw new Error("Location is required.");
+    }
+    if (!command.deviceId) {
+      throw new Error("Device ID is required.");
+    }
 
-    const helpRequest = await this.helpRequestRepository.add(command);
+    const helpRequest = await this.helpRequestRepository.add(
+      requester,
+      command.location,
+      command.deviceId
+    );
     if (!helpRequest) {
       throw new Error("Failed to create help request.");
     }
@@ -68,7 +78,7 @@ export class CreateHelpRequestUseCase {
     const nearByDeviceUniqueLatest = nearByDevice.toUniqueLatest();
     let candidates = CandidatesCollection.create();
     nearByDeviceUniqueLatest.all.forEach(device => {
-      candidates = candidates.add(Candidate.create(device.ownerId));
+      candidates = candidates.add(Candidate.create(device.ownerId, device.id));
     });
 
     const requesterDevice = await this.deviceRepository.findById(command.deviceId);
@@ -92,7 +102,7 @@ export class CreateHelpRequestUseCase {
     );
 
     const requestedHelpRequest = addedHelpRequest.requestedProximityVerification();
-    this.helpRequestRepository.save(requestedHelpRequest, requester);
+    this.helpRequestRepository.save(requestedHelpRequest);
 
     return requestedHelpRequest;
   }

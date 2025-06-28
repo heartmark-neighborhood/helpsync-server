@@ -6,12 +6,13 @@ import { ProximityVerificationId } from "./proximity-verification-id.value";
 import { IClock } from "../shared/service/i-clock.service";
 
 import { z } from "zod";
+import { addMinutes } from "date-fns";
 
 export const HelpRequestStatusSchema = z.enum([
   'pending',
-  'searching',
-  'waiting_response',
+  'proximity-verification-requested',
   'matched',
+  'helping',
   'completed',
   'failed',
   'canceled'
@@ -37,6 +38,7 @@ export class HelpRequest{
     readonly createdAt: Date,
     readonly updatedAt: Date,
     readonly candidatesCollection: CandidatesCollection,
+    readonly proximityCheckDeadline: Date,
     private readonly clock: IClock
   ){}
 
@@ -49,6 +51,7 @@ export class HelpRequest{
     createdAt: Date,
     updatedAt: Date,
     candidates: CandidatesCollection = CandidatesCollection.create(),
+    proximityCheckDeadline: Date,
     clock: IClock
   ): HelpRequest {
     return new HelpRequest(
@@ -60,6 +63,7 @@ export class HelpRequest{
       createdAt, 
       updatedAt, 
       candidates,
+      proximityCheckDeadline,
       clock
     );
   }
@@ -75,6 +79,7 @@ export class HelpRequest{
       this.createdAt,
       this.clock.now(),
       updatedCandidates,
+      this.proximityCheckDeadline,
       this.clock
     );
   }
@@ -90,41 +95,73 @@ export class HelpRequest{
       }
       return candidate;
     });
+
+    const newProximityCheckDeadline = addMinutes(this.clock.now(), 1);
+
     const newCandidatesCollection = CandidatesCollection.create(updatedCandidates);
     return new HelpRequest(
       this.id,
       this.proximityVerificationId,
       this.requesterId,
-      'searching',
+      'proximity-verification-requested',
       this.location,
       this.createdAt,
       this.clock.now(),
       newCandidatesCollection,
+      newProximityCheckDeadline,
       this.clock
     );
   }
 
   timeoutProximityVerification(): HelpRequest {
-    if (this.status !== 'searching') {
+    if (this.status !== 'proximity-verification-requested') {
       throw new Error('Invalid state transition');
     }
 
-    const updatedCandidates = this.candidatesCollection.all.map(candidate => {
-      if (candidate.statusIs('pending')) {
-        candidate.failProximityVerification();
-      }
-      return candidate;
-    });
-    const newCandidatesCollection = CandidatesCollection.create(updatedCandidates);
+    const updatedCandidates = this.candidatesCollection.timeoutProximityVerification();
+    if(updatedCandidates.existsByStatus('proximity-verification-succeeded')) {
+      return new HelpRequest(
+        this.id,
+        this.proximityVerificationId,
+        this.requesterId,
+        'matched',
+        this.location,
+        this.createdAt,
+        this.clock.now(),
+        updatedCandidates,
+        this.proximityCheckDeadline,
+        this.clock
+      );
+    }
     return new HelpRequest(
       this.id,
       this.proximityVerificationId,
       this.requesterId,
-      'waiting_response',
+      'failed',
       this.location,
       this.createdAt,
       this.clock.now(),
-      newCandidatesCollection,
+      updatedCandidates,
+      this.proximityCheckDeadline,
+      this.clock
+    );
+  }
+
+  requestHelp(): HelpRequest {
+    if (this.status !== "matched") {
+      throw new Error("Invalid state transition");
+    }
+
+    return new HelpRequest(
+      this.id,
+      this.proximityVerificationId,
+      this.requesterId,
+      "helping",
+      this.location,
+      this.createdAt,
+      this.clock.now(),
+      this.candidatesCollection,
+      this.proximityCheckDeadline,
       this.clock
     );
   }
@@ -135,10 +172,11 @@ export class HelpRequest{
       proximityVerificationId: this.proximityVerificationId.value,
       requesterId: this.requesterId.value,
       status: this.status,
-      location: this.location,
+      location: this.location.toPersistenceModel(),
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      candidates: this.candidatesCollection.toPersistenceModel()
+      candidates: this.candidatesCollection.toPersistenceModel(),
+      proximityCheckDeadline: this.proximityCheckDeadline
     };
   }
 }
