@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { Location, LocationSchema } from '../../domain/shared/value-object/Location.value';
 import { DeviceId } from '../../domain/device/device-id.value';
 import { GeoPoint, Timestamp } from 'firebase-admin/firestore';
+import { UserInfo, UserInfoDTO, UserInfoSchema } from '../../domain/help-request/user-info.dto';
 
 const HelpRequestDocSchema = z.object({
   id: HelpRequestIdSchema,
@@ -24,11 +25,7 @@ const HelpRequestDocSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   proximityCheckDeadline: z.date(),
-  requesterInfo: z.object({
-    nickname: z.string(),
-    iconUrl: z.string(),
-    deviceId: z.string()
-  })
+  requesterInfo: UserInfoSchema
 });
 
 export type HelpRequestDoc = z.infer<typeof HelpRequestDocSchema>;
@@ -66,17 +63,31 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     const candidates = helpRequestData.candidates;
     if( candidates && candidates.length > 0 ) {
       candidates.forEach((candidate) => {
-        const candidateRef = helpRequestRef.collection('candidates').doc(candidate.candidateId);
-        const candidateData = {
-          candidateId: candidate.candidateId,
-          status: candidate.status,
-          notifiedDeviceId: candidate.notifiedDeviceId
+        const candidateRef = helpRequestRef.collection('candidates').doc(candidate.id);
+        const candidateData: UserInfoDTO = {
+          id: candidate.id,
+          nickname: candidate.nickname,
+          iconUrl: candidate.iconUrl,
+          physicalDescription: candidate.physicalDescription,
+          deviceId: candidate.deviceId
         };
         batch.set(candidateRef, candidateData, { merge: true });
       });
     }
     const candidatesCollection = CandidatesCollection.create(
-      helpRequestData.candidates.map((candidate) => Candidate.fromPersistenceModel(candidate))
+      helpRequestData.candidates.map((candidate) => {
+        const userInfo = UserInfo.create({
+          id: candidate.id,
+          nickname: candidate.nickname,
+          iconUrl: candidate.iconUrl,
+          physicalDescription: candidate.physicalDescription,
+          deviceId: candidate.deviceId
+        });
+        return Candidate.create(
+          userInfo,
+          candidate.status
+        );
+      })
     );
 
     await batch.commit();
@@ -108,10 +119,11 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     const candidatesCollection = CandidatesCollection.create(
       candidatesSnapshot.docs.map((doc) => {
         const candidateData = doc.data();
+        const UserInfoDTO = UserInfoSchema.parse(candidateData);
+        const userInfo = UserInfo.fromPersistenceModel(UserInfoDTO);
         return Candidate.create(
-          UserId.create(candidateData.candidateId),
-          DeviceId.create(candidateData.notifiedDeviceId),
-          candidateData.status,
+          userInfo,
+          candidateData.status
         );
       })
     );
@@ -127,20 +139,14 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       }),
       helpRequestData.createdAt,
       helpRequestData.updatedAt,
-      CandidatesCollection.create(), // Assuming candidates are not loaded here
+      candidatesCollection,
       helpRequestData.proximityCheckDeadline,
       this.clock
     );
 
     
-    const requesterInfo = helpRequestData.requesterInfo;
-    const requester = {
-      id: UserId.create(requesterInfo.deviceId),
-      nickname: requesterInfo.nickname,
-      iconUrl: requesterInfo.iconUrl,
-      physicalDescription: '', // Assuming physicalDescription is not available in the requesterInfo
-      deviceId: DeviceId.create(requesterInfo.deviceId)
-    };
+    const requesterInfoDTO = helpRequestData.requesterInfo;
+    const requester = UserInfo.fromPersistenceModel(requesterInfoDTO);
 
     return {
       helpRequest,
