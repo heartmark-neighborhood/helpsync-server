@@ -18,9 +18,11 @@ export class ProximityVerificationNotifier implements IProximityVerificationNoti
 
   async send(targetDeviceId: DeviceId, proximityVerificationId: ProximityVerificationId, expiredAt: Date): Promise<void> {
     const data = {
-      proximityVerificationId: proximityVerificationId.value,
-      expiredAt: expiredAt.toISOString(),
       type: "proximity-verification",
+      data: {
+        proximityVerificationId: proximityVerificationId.value,
+        expiredAt: expiredAt.toISOString(),
+      }
     };
     
     try {
