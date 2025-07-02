@@ -1,7 +1,7 @@
 import { DeviceId } from "../../device/device-id.value";
-import { UserId } from "../../user/user-id.value";
-import { RequesterProfileDto } from "../requester-profile.dto";
+import { UserInfo } from "../user-info.dto";
 
 export interface IHelpRequestNotifier {
-  send(targetDeviceId: DeviceId, requesterProfile: RequesterProfileDto): Promise<void>;
+  notifyRequesterOfMatches(targetDeviceId: DeviceId, requesterInfo: UserInfo): Promise<void>;
+  notifySupporterOfMatches(targetDeviceId: DeviceId, requesterInfos: UserInfo[]): Promise<void>;
 }

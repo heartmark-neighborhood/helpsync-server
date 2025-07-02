@@ -1,12 +1,11 @@
 import { IHelpRequestNotifier } from "../../domain/help-request/service/i-help-request.notifier";
-import { RequesterProfileDto } from "../../domain/help-request/requester-profile.dto";
-
 import { FcmGateway } from "./fcm-gateway";
 import { DeviceId } from "../../domain/device/device-id.value";
 import { logger } from "firebase-functions";
+import { UserInfo } from "../../domain/help-request/user-info.dto";
 
 
-class HelpRequestNotifier implements IHelpRequestNotifier {
+export class HelpRequestNotifier implements IHelpRequestNotifier {
   private gateway: FcmGateway;
 
   static create(gateway: FcmGateway): HelpRequestNotifier {
@@ -17,11 +16,38 @@ class HelpRequestNotifier implements IHelpRequestNotifier {
     this.gateway = gateway;
   }
 
-  async send(targetDeviceId: DeviceId, requesterProfile: RequesterProfileDto): Promise<void> {
+  async notifyRequesterOfMatches(targetDeviceId: DeviceId, requesterInfo: UserInfo): Promise<void> {
     const data = {
-      nickname: requesterProfile.nickname,
-      iconUrl: requesterProfile.iconUrl,
-      physicalDescription: requesterProfile.physicalDescription,
+      type: "help-request",
+      data: {
+        requester: {
+          id: requesterInfo.id,
+          nickname: requesterInfo.nickname,
+          iconUrl: requesterInfo.iconUrl,
+          physicalDescription: requesterInfo.physicalDescription,
+        }
+      }
+    }
+
+    try {
+      await this.gateway.sendNotification(targetDeviceId, data);
+    } catch (error) {
+      logger.error("Failed to send help request notification:", error);
+      throw new Error("Notification sending failed");
+    }
+  }
+
+  async notifySupporterOfMatches(targetDeviceId: DeviceId, candidatesInfo: UserInfo[]): Promise<void> {
+    const data = {
+      type: "help-request",
+      data: {
+        candidates: candidatesInfo.map(candidate => ({
+          id: candidate.id,
+          nickname: candidate.nickname,
+          iconUrl: candidate.iconUrl,
+          physicalDescription: candidate.physicalDescription,
+        }))
+      }
     }
 
     try {
