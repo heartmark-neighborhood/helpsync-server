@@ -7,9 +7,9 @@ export class ProximityVerificationTimeoutScheduler implements IProximityVerifica
   private readonly client: CloudTasksClient;
   private readonly QUEUE = "proximity-verification-timeout-queue";
   private readonly FUNCTION_URL = "https://<function-name>-<random-hash>-<region>.a.run.app"; // TODO: Replace with actual Cloud Function URL
-  private readonly PROJECT_ID = "heartmark-neighborhood"; // TODO: Replace with actual project ID
-  private readonly SERVICE_ACCOUNT_EMAIL = `${this.PROJECT_ID}@appspot.gserviceaccount.com`; // TODO: Replace with actual service account email
-  private readonly LOCATION = "asia-northeast1"; // TODO: Replace with actual region
+  private readonly PROJECT_ID = "heartmark-neighborhood";
+  private readonly SERVICE_ACCOUNT_EMAIL = `${this.PROJECT_ID}@appspot.gserviceaccount.com`;
+  private readonly LOCATION = "asia-northeast1";
 
 
   constructor() {
