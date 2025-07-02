@@ -1,16 +1,12 @@
-import { UserId } from "../user/user-id.value";
 import { z } from "zod";
-import { UserIdSchema } from "../user/user-id.value";
-import { DeviceId, DeviceIdSchema } from "../device/device-id.value";
+import { UserInfo, UserInfoSchema } from "./user-info.dto";
 
 const CandidateStatusSchema = z.enum([
   'pending',
   'proximity-verification-requested',
   'proximity-verification-failed',
   'proximity-verification-succeeded',
-  'notified',
-  'accepted',
-  'declined'
+  'help-request-notified',
 ], {
   errorMap: (issue, ctx) => {
     if (issue.code === 'invalid_enum_value') {
@@ -23,9 +19,8 @@ const CandidateStatusSchema = z.enum([
 export type CandidateStatus = z.infer<typeof CandidateStatusSchema>;
 
 export const CandidateSchema = z.object({
-  candidateId: UserIdSchema,
-  status: CandidateStatusSchema,
-  notifiedDeviceId: DeviceIdSchema
+  userInfo: UserInfoSchema,
+  status: CandidateStatusSchema
 });
 
 export type CandidatePersistenceModel = z.infer<typeof CandidateSchema>;
@@ -33,21 +28,24 @@ export type CandidatePersistenceModel = z.infer<typeof CandidateSchema>;
 
 export class Candidate {
   private constructor(
-    readonly candidateId: UserId,
-    private _notifiedDeviceId: DeviceId,
+    readonly userInfo: UserInfo,
     private _status: CandidateStatus,
   ) {}
 
-  static create(candidateId: UserId, notifiedDeviceId: DeviceId, status: CandidateStatus = 'pending'): Candidate {
+  static create(userInfo: UserInfo, status: CandidateStatus = 'pending'): Candidate {
     CandidateStatusSchema.parse(status); // Validate status
-    return new Candidate(candidateId, notifiedDeviceId, status);
+    return new Candidate(userInfo, status);
+  }
+
+  get status(): CandidateStatus {
+    return this._status;
   }
 
   static fromPersistenceModel(model: CandidatePersistenceModel): Candidate {
-    const candidateId = UserId.create(model.candidateId);
-    const notifiedDeviceId = DeviceId.create(model.notifiedDeviceId);
+    const userInfoDTO = UserInfoSchema.parse(model.userInfo);
+    const userInfo = UserInfo.create(userInfoDTO); // Validate and create UserInfo
     const status = CandidateStatusSchema.parse(model.status); // Validate status
-    return new Candidate(candidateId, notifiedDeviceId, status);
+    return Candidate.create(userInfo, status);
   }
 
   statusIs(status: CandidateStatus): boolean {
@@ -55,12 +53,19 @@ export class Candidate {
     return this._status === status;
   }
 
-  toPersistenceModel():  CandidatePersistenceModel {
+  toPersistenceModel():  {id: string, nickname: string, iconUrl: string, physicalDescription: string, deviceId: string, status: CandidateStatus} {
     return {
-      candidateId: this.candidateId.value,
-      notifiedDeviceId: this._notifiedDeviceId.value,
-      status: this._status,
+      id: this.userInfo.id.value,
+      nickname: this.userInfo.nickname,
+      iconUrl: this.userInfo.iconUrl,
+      physicalDescription: this.userInfo.physicalDescription,
+      deviceId: this.userInfo.deviceId.value,
+      status: this._status
     };
+  }
+
+  toUserInfo(): UserInfo {
+    return this.userInfo;
   }
 
   requestProximityVerification(): void {
@@ -83,24 +88,10 @@ export class Candidate {
     this._status = 'proximity-verification-succeeded';
   }
 
-  notify(): void {
+  notified(): void {
     if (this._status !== 'proximity-verification-succeeded') {
       throw new Error('Invalid state transition');
     }
-    this._status = 'notified';
-  }
-
-  accept(): void {
-    if (this._status !== 'notified') {
-      throw new Error('Invalid state transition');
-    }
-    this._status = 'accepted';
-  }
-
-  decline(): void {
-    if (this._status !== 'notified') {
-      throw new Error('Invalid state transition');
-    }
-    this._status = 'declined';
+    this._status = 'help-request-notified';
   }
 }
