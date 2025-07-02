@@ -12,7 +12,7 @@ export const HelpRequestStatusSchema = z.enum([
   'pending',
   'proximity-verification-requested',
   'matched',
-  'helping',
+  'sent',
   'completed',
   'failed',
   'canceled'
@@ -147,20 +147,22 @@ export class HelpRequest{
     );
   }
 
-  requestHelp(): HelpRequest {
+  sentHelpRequest(): HelpRequest {
     if (this.status !== "matched") {
       throw new Error("Invalid state transition");
     }
+
+    const notifiedCandidates = this.candidatesCollection.notifiedHelpRequest();
 
     return new HelpRequest(
       this.id,
       this.proximityVerificationId,
       this.requesterId,
-      "helping",
+      "sent",
       this.location,
       this.createdAt,
       this.clock.now(),
-      this.candidatesCollection,
+      notifiedCandidates,
       this.proximityCheckDeadline,
       this.clock
     );

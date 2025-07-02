@@ -3,7 +3,6 @@ import * as FirebaseFirestore from '@google-cloud/firestore';
 import { HelpRequest, HelpRequestStatusSchema } from '../../domain/help-request/help-request.entity';
 import { HelpRequestWithRequesterInfo, IHelpRequestRepository } from '../../domain/help-request/i-help-request.repository';
 import { HelpRequestId, HelpRequestIdSchema } from '../../domain/help-request/help-request-id.value';
-import { CreateHelpRequestCommand } from '../../domain/help-request/create-help-request.usecase';
 import { User } from '../../domain/user/User.entity';
 import { IClock } from '../../domain/shared/service/i-clock.service';
 import { UserId, UserIdSchema } from '../../domain/user/user-id.value';
@@ -139,6 +138,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       id: UserId.create(requesterInfo.deviceId),
       nickname: requesterInfo.nickname,
       iconUrl: requesterInfo.iconUrl,
+      physicalDescription: '', // Assuming physicalDescription is not available in the requesterInfo
       deviceId: DeviceId.create(requesterInfo.deviceId)
     };
 
@@ -158,9 +158,11 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     const proximityVerificationId = ProximityVerificationId.create();
     const requesterId = requester.id;
     const requesterInfo = {
+      "id": requesterId.value,
       "nickname": requester.nickname,
       "iconUrl": requester.iconUrl,
-      "deviceId": requestedDeviceId.toString()
+      "deviceId": requestedDeviceId.toString(),
+      "physicalDescription": requester.physicalFeatures || '' // Assuming physicalDescription is optional
     }
     const status = 'pending';
     const location = new GeoPoint(requestedLocation.latitude, requestedLocation.longitude);
