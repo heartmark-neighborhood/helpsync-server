@@ -14,7 +14,7 @@ export class MemoryDeviceRepository implements IDeviceRepository {
 
 
 
-  private requesterDevice = Device.create(
+  private _requesterDevice = Device.create(
     DeviceId.create('requester-device-id'),
     UserId.create('requester-id'),
     DeviceToken.create('requester-device-token'),
@@ -58,11 +58,15 @@ export class MemoryDeviceRepository implements IDeviceRepository {
 
   constructor() {
     // Initialize with some dummy devices
-    this.devices.push(this.requesterDevice);
+    this.devices.push(this._requesterDevice);
     this.devices.push(this.supporter1Device1);
     this.devices.push(this.supporter1Device2);
     this.devices.push(this.supporter1Device3);
     this.devices.push(this.supporter2Device1);
+  }
+
+  get requesterDevice(): Device {
+    return this._requesterDevice;
   }
 
   async save(device: Device): Promise<Device> {

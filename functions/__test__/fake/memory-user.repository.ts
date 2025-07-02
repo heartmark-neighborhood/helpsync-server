@@ -42,6 +42,11 @@ export class MemoryUserRepository implements IUserRepository {
     this.users.push(this.supporter1);
     this.users.push(this.supporter2);
   }
+
+  get requesterUser(): User {
+    return this.requester;
+  }
+
   async save(user: User): Promise<User> {
     const index = this.users.findIndex(u => u.id.equals(user.id));
     if (index !== -1) {
