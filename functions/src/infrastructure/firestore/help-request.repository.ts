@@ -58,7 +58,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       updatedAt: Timestamp.fromDate(helpRequestData.updatedAt),
       proximityCheckDeadline: Timestamp.fromDate(helpRequestData.proximityCheckDeadline)
     };
-    batch.update(helpRequestRef, helpRequestDocData);
+    batch.set(helpRequestRef, helpRequestDocData, { merge: true });
 
     const candidates = helpRequestData.candidates;
     if( candidates && candidates.length > 0 ) {
