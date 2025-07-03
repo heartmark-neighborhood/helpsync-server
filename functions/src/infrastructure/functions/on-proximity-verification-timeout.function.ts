@@ -1,6 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { https, logger } from "firebase-functions";
-import  { ProximityVerificationTimeoutCommand, ProximityVerificationTimeoutInputSchema, ProximityVerificationTimeoutUseCase } from "../../domain/help-request/on-proximity-verification-timeout.usecase";import { HelpRequestRepository } from "../firestore/help-request.repository";
+import  { ProximityVerificationTimeoutCommand, ProximityVerificationTimeoutInputSchema, ProximityVerificationTimeoutUseCase } from "../../domain/help-request/on-proximity-verification-timeout.usecase";
+import { HelpRequestRepository } from "../firestore/help-request.repository";
 import { SystemClock } from "../service/SystemClock";
 import { HelpRequestNotifier } from "../notifications/help-request.notifier";
 import { FcmGateway } from "../notifications/fcm-gateway";
