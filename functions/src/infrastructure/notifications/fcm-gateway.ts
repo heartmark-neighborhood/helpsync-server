@@ -5,7 +5,7 @@ import { DeviceToken } from "../../domain/device/device-token.value";
 
 
 export class FcmGateway {
-  public static create(): FcmGateway {
+  static create(): FcmGateway {
     return new FcmGateway();
   }
   private constructor() {
@@ -26,9 +26,9 @@ export class FcmGateway {
 
     try{
       await admin.messaging().send(message);
-      logger.info("Notification sent successfully", { fcmToken: deviceToken, data });
+      logger.info("Notification sent successfully", { deviceToken: deviceToken, data });
     } catch (error) {
-      logger.error("Error sending notification", { fcmToken: deviceToken, error });
+      logger.error("Error sending notification", { deviceToken: deviceToken, error });
       throw new Error("Failed to send notification");
     }
   }
