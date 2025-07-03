@@ -1,9 +1,8 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
 
 import { HelpRequest, HelpRequestStatusSchema } from '../../domain/help-request/help-request.entity';
-import { IHelpRequestRepository } from '../../domain/help-request/i-help-request.repository';
+import { HelpRequestWithRequesterInfo, IHelpRequestRepository } from '../../domain/help-request/i-help-request.repository';
 import { HelpRequestId, HelpRequestIdSchema } from '../../domain/help-request/help-request-id.value';
-import { CreateHelpRequestCommand } from '../../domain/help-request/create-help-request.usecase';
 import { User } from '../../domain/user/User.entity';
 import { IClock } from '../../domain/shared/service/i-clock.service';
 import { UserId, UserIdSchema } from '../../domain/user/user-id.value';
@@ -13,6 +12,9 @@ import { Candidate } from '../../domain/help-request/candidate.entity';
 
 import { z } from 'zod';
 import { Location, LocationSchema } from '../../domain/shared/value-object/Location.value';
+import { DeviceId } from '../../domain/device/device-id.value';
+import { GeoPoint, Timestamp } from 'firebase-admin/firestore';
+import { UserInfo, UserInfoDTO, UserInfoSchema } from '../../domain/help-request/user-info.dto';
 
 const HelpRequestDocSchema = z.object({
   id: HelpRequestIdSchema,
@@ -21,9 +23,12 @@ const HelpRequestDocSchema = z.object({
   status: HelpRequestStatusSchema,
   location: LocationSchema,
   createdAt: z.date(),
-  updatedAt: z.date()
+  updatedAt: z.date(),
+  proximityCheckDeadline: z.date(),
+  requesterInfo: UserInfoSchema
 });
 
+export type HelpRequestDoc = z.infer<typeof HelpRequestDocSchema>;
 
 export class HelpRequestRepository implements IHelpRequestRepository {
   private db: FirebaseFirestore.Firestore;
@@ -38,117 +43,164 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     this.clock = clock;
   }
 
-  async save(helpRequest: HelpRequest, requester: User): Promise<HelpRequest> {
-    
-
+  async save(helpRequest: HelpRequest): Promise<HelpRequest> {
     const helpRequestRef = this.db.collection('helpRequests').doc(helpRequest.id.value);
     const batch = this.db.batch();
 
-    const { status, location, createdAt, updatedAt, proximityVerificationId } = helpRequest.toPersistenceModel();
-    batch.set(helpRequestRef, {
-      id: helpRequest.id.value,
-      requesterId: requester.id.value,
-      proximityVerificationId,
-      status,
-      location: {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        geohash: location.calcGeohash()
-      },
-      createdAt,
-      updatedAt
-    });
+    const helpRequestData = helpRequest.toPersistenceModel();
+    const helpRequestDocData = {
+      id: helpRequestData.id,
+      proximityVerificationId: helpRequestData.proximityVerificationId,
+      requesterId: helpRequestData.requesterId,
+      status: helpRequestData.status,
+      location: new GeoPoint(helpRequestData.location.latitude, helpRequestData.location.longitude),
+      createdAt: Timestamp.fromDate(helpRequestData.createdAt),
+      updatedAt: Timestamp.fromDate(helpRequestData.updatedAt),
+      proximityCheckDeadline: Timestamp.fromDate(helpRequestData.proximityCheckDeadline)
+    };
+    batch.set(helpRequestRef, helpRequestDocData, { merge: true });
 
-    const candidatesRef = helpRequestRef.collection('candidates');
-    helpRequest.candidatesCollection.all.forEach((candidate) => {
-      const { candidateId, status } = candidate.toPersistenceModel();
-      batch.set(candidatesRef.doc(candidateId), {
-        candidateId,
-        status
+    const candidates = helpRequestData.candidates;
+    if( candidates && candidates.length > 0 ) {
+      candidates.forEach((candidate) => {
+        const candidateRef = helpRequestRef.collection('candidates').doc(candidate.id);
+        const candidateData: UserInfoDTO = {
+          id: candidate.id,
+          nickname: candidate.nickname,
+          iconUrl: candidate.iconUrl,
+          physicalDescription: candidate.physicalDescription,
+          deviceId: candidate.deviceId
+        };
+        batch.set(candidateRef, candidateData, { merge: true });
       });
-    });
+    }
+    const candidatesCollection = CandidatesCollection.create(
+      helpRequestData.candidates.map((candidate) => {
+        const userInfo = UserInfo.create({
+          id: candidate.id,
+          nickname: candidate.nickname,
+          iconUrl: candidate.iconUrl,
+          physicalDescription: candidate.physicalDescription,
+          deviceId: candidate.deviceId
+        });
+        return Candidate.create(
+          userInfo,
+          candidate.status
+        );
+      })
+    );
 
     await batch.commit();
-    return helpRequest;
+
+    return HelpRequest.create(
+      helpRequest.id,
+      helpRequest.proximityVerificationId,
+      helpRequest.requesterId,
+      helpRequest.status,
+      helpRequest.location,
+      helpRequest.createdAt,
+      this.clock.now(),
+      candidatesCollection,
+      helpRequest.proximityCheckDeadline,
+      this.clock
+    );
   }
 
 
-  async findById(id: HelpRequestId): Promise<HelpRequest | null> {
+  async findWithRequesterInfoById(id: HelpRequestId): Promise<HelpRequestWithRequesterInfo | null> {
     const helpRequestRef = this.db.collection('helpRequests').doc(id.value);
+    const candidateCollectionRef = helpRequestRef.collection('candidates');
     const doc = await helpRequestRef.get();
 
     if (!doc.exists) return null;
 
-    const data = HelpRequestDocSchema.parse(doc.data());
-    const candidatesSnapshot = await helpRequestRef.collection('candidates').get();
-    const candidates = candidatesSnapshot.docs.map((doc) => {
-      const candidateData = doc.data();
-      return  Candidate.fromPersistenceModel({
-        candidateId:  candidateData.candidateId,
-        status: candidateData.status
-      });
-    });
-    const candidatesCollection = CandidatesCollection.create(candidates);
+    const helpRequestData = HelpRequestDocSchema.parse(doc.data());
+    const candidatesSnapshot = await candidateCollectionRef.get();
+    const candidatesCollection = CandidatesCollection.create(
+      candidatesSnapshot.docs.map((doc) => {
+        const candidateData = doc.data();
+        const UserInfoDTO = UserInfoSchema.parse(candidateData);
+        const userInfo = UserInfo.fromPersistenceModel(UserInfoDTO);
+        return Candidate.create(
+          userInfo,
+          candidateData.status
+        );
+      })
+    );
 
-    const location = Location.create(data.location);
-
-    return HelpRequest.create(
-      HelpRequestId.create(data.id),
-      ProximityVerificationId.create(data.proximityVerificationId),
-      UserId.create(data.requesterId),
-      data.status,
-      location,
-      data.createdAt,
-      data.updatedAt,
+    const helpRequest = HelpRequest.create(
+      HelpRequestId.create(helpRequestData.id),
+      ProximityVerificationId.create(helpRequestData.proximityVerificationId),
+      UserId.create(helpRequestData.requesterId),
+      helpRequestData.status,
+      Location.create({
+        latitude: helpRequestData.location.latitude,
+        longitude: helpRequestData.location.longitude
+      }),
+      helpRequestData.createdAt,
+      helpRequestData.updatedAt,
       candidatesCollection,
+      helpRequestData.proximityCheckDeadline,
       this.clock
     );
-  }
 
-  async add(command: CreateHelpRequestCommand): Promise<HelpRequest> {
+    
+    const requesterInfoDTO = helpRequestData.requesterInfo;
+    const requester = UserInfo.fromPersistenceModel(requesterInfoDTO);
 
-
-    const helpRequestRef = this.db.collection('helpRequests').doc();
-    const batch = this.db.batch();
-
-    const requesterId = UserId.create(command.requesterId.value);
-    const proximityVerificationId = ProximityVerificationId.create();
-    const status = 'pending';
-    const location = command.location;
-    const createdAt = this.clock.now();
-    const updatedAt = this.clock.now();
-
-    const helpRequestObject = {
-      id: helpRequestRef.id,
-      proximityVerificationId: proximityVerificationId.value,
-      requesterId: requesterId.value,
-      status,
-      location: {
-        ...location.toPersistenceModel(),
-        geohash: location.calcGeohash()
-      },
-      createdAt,
-      updatedAt,
+    return {
+      helpRequest,
+      requester
     };
 
-    batch.set(helpRequestRef, helpRequestObject);
 
-    await batch.commit();
+  }
+
+  async add(requester: User, requestedLocation: Location, requestedDeviceId: DeviceId): Promise<HelpRequest> {
+    const batch = this.db.batch();
+    const helpRequestRef = this.db.collection('helpRequests').doc();
 
     const helpRequestId = HelpRequestId.create(helpRequestRef.id);
-    const candidatesCollection = CandidatesCollection.create();
-    const helpRequest = HelpRequest.create(
+    const proximityVerificationId = ProximityVerificationId.create();
+    const requesterId = requester.id;
+    const requesterInfo = {
+      "id": requesterId.value,
+      "nickname": requester.nickname,
+      "iconUrl": requester.iconUrl,
+      "deviceId": requestedDeviceId.toString(),
+      "physicalDescription": requester.physicalFeatures || '' // Assuming physicalDescription is optional
+    }
+    const status = 'pending';
+    const location = new GeoPoint(requestedLocation.latitude, requestedLocation.longitude);
+    const createdAt = Timestamp.fromDate(this.clock.now());
+    const updatedAt = createdAt;
+    const proximityCheckDeadline = createdAt; // Assuming proximityCheckDeadline is the same as createdAt for now
+
+    const helpRequestData = {
+      id: helpRequestId.value,
+      proximityVerificationId: proximityVerificationId.value,
+      requesterId: requesterId.value,
+      requesterInfo,
+      status,
+      location,
+      createdAt,
+      updatedAt,
+      proximityCheckDeadline
+    };
+
+    batch.set(helpRequestRef, helpRequestData);
+
+    return HelpRequest.create(
       helpRequestId,
       proximityVerificationId,
       requesterId,
       status,
-      location,
-      createdAt,
-      updatedAt,
-      candidatesCollection,
+      requestedLocation,
+      createdAt.toDate(),
+      updatedAt.toDate(),
+      CandidatesCollection.create(),
+      proximityCheckDeadline.toDate(), // Assuming proximityCheckDeadline is the same as createdAt for now
       this.clock
     );
-    
-    return helpRequest;
   }
 }

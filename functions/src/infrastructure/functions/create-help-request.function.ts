@@ -9,10 +9,13 @@ import { CreateHelpRequestCommand, CreateHelpRequestUseCase } from "../../domain
 import { HelpRequestRepository } from "../firestore/help-request.repository";
 import { UserRepository } from "../firestore/User.repository";
 import { FcmGateway } from "../notifications/fcm-gateway";
-import { ProximityVerificationNotifier } from "../notifications/proximity-verification-notifier";
+import { ProximityVerificationNotifier } from "../notifications/proximity-verification.notifier";
 import { UserId } from "../../domain/user/user-id.value";
 import { Location } from "../../domain/shared/value-object/Location.value";
 import { SystemClock } from "../service/SystemClock";
+import { ProximityVerificationTimeoutScheduler } from "../cloudtasks/proximity-verification-timeout.scheduler";
+import { DeviceRepository } from "../firestore/device.repository";
+import { DeviceId } from "../../domain/device/device-id.value";
 
 
 export const createHelpRequest = https.onCall(
@@ -25,24 +28,30 @@ export const createHelpRequest = https.onCall(
 
     try {
       const db = getFirestore();
-      const helpRequestRepository = HelpRequestRepository.create(db);
+      const clock = SystemClock.create();
+      const helpRequestRepository = HelpRequestRepository.create(db, clock);
       const userRepository = UserRepository.create(db);
+      const deviceRepository = DeviceRepository.create(db, clock);
       const notifier = ProximityVerificationNotifier.create(FcmGateway.create());
+      const scheduler = ProximityVerificationTimeoutScheduler.create();
 
       const usecase = CreateHelpRequestUseCase.create(
         helpRequestRepository,
         userRepository,
-        notifier
+        deviceRepository,
+        notifier,
+        scheduler,
       );
 
-      const requesterId = UserId.create(request.auth.uid);
       const input = CreateHelpRequestInputSchema.parse(request.data);
+      const requesterId = UserId.create(request.auth.uid);
       const location = Location.create(input.location);
-      const clock = SystemClock.create();
+      const deviceId = DeviceId.create(input.deviceId);
 
       const command = CreateHelpRequestCommand.create(
         requesterId,
         location,
+        deviceId,
         clock
       );
 

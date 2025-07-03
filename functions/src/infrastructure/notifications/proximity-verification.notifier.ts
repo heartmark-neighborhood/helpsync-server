@@ -1,8 +1,8 @@
 import { logger } from "firebase-functions";
 import { ProximityVerificationId } from "../../domain/help-request/proximity-verification-id.value";
 import { IProximityVerificationNotifier } from "../../domain/help-request/service/i-proximity-verification.notifier";
-import { UserId } from "../../domain/user/user-id.value";
 import { FcmGateway } from "./fcm-gateway";
+import { DeviceId } from "../../domain/device/device-id.value";
 
 
 export class ProximityVerificationNotifier implements IProximityVerificationNotifier {
@@ -16,15 +16,17 @@ export class ProximityVerificationNotifier implements IProximityVerificationNoti
     this.gateway = gateway;
   }
 
-  async send(targetUserId: UserId, proximityVerificationId: ProximityVerificationId, expiredAt: Date): Promise<void> {
+  async send(targetDeviceId: DeviceId, proximityVerificationId: ProximityVerificationId, expiredAt: Date): Promise<void> {
     const data = {
-      proximityVerificationId: proximityVerificationId.value,
-      expiredAt: expiredAt.toISOString(),
       type: "proximity-verification",
+      data: {
+        proximityVerificationId: proximityVerificationId.value,
+        expiredAt: expiredAt.toISOString(),
+      }
     };
     
     try {
-      await this.gateway.sendNotification(targetUserId.value, data);
+      await this.gateway.sendNotification(targetDeviceId, data);
     } catch (error) {
       logger.error("Failed to send proximity verification notification:", error);
       throw new Error("Notification sending failed");

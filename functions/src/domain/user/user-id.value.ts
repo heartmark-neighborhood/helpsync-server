@@ -19,10 +19,7 @@ export class UserId {
     return new UserId(value);
   }
 
-  equals(other: any): boolean {
-    if (!(other instanceof UserId)) {
-      return false;
-    }
+  equals(other: UserId): boolean {
     return this.value === other.value;
   }
 }

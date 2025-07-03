@@ -1,7 +1,12 @@
 import { UserId } from "../user/user-id.value";
-import { Candidate } from "./candidate.entity";
+import { Candidate, CandidateSchema } from "./candidate.entity";
 import { CandidateStatus } from "./candidate.entity";
 
+import { z } from "zod";
+import { UserInfo } from "./user-info.dto";
+
+export const CandidatesCollectionSchema = z.array(CandidateSchema);
+export type CandidatesCollectionProps = z.infer<typeof CandidatesCollectionSchema>;
 
 export class CandidatesCollection {
   private readonly candidates: Candidate[] = [];
@@ -14,15 +19,27 @@ export class CandidatesCollection {
     return new CandidatesCollection(candidates);
   }
 
+  withStatus(status: CandidateStatus): CandidatesCollection {
+    const filteredCandidates = this.candidates.filter((candidate) => candidate.statusIs(status));
+    return CandidatesCollection.create(filteredCandidates);
+  }
+
+  add(candidate: Candidate): CandidatesCollection {
+    if (this.exists(candidate.userInfo.id)) {
+      throw new Error(`Candidate with ID ${candidate.userInfo.id.value} already exists.`);
+    }
+    return CandidatesCollection.create([...this.candidates, candidate]);
+  }
+
   addAll(candidates: CandidatesCollection): CandidatesCollection {
     const newCandidates = candidates.all.filter(
-      (candidate) => !this.exists(candidate.candidateId)
+      (candidate) => !this.exists(candidate.userInfo.id)
     );
-    return new CandidatesCollection([...this.candidates, ...newCandidates]);
+    return CandidatesCollection.create([...this.candidates, ...newCandidates]);
   }
 
   exists(candidateId: UserId): boolean {
-    return this.candidates.some((c) => c.candidateId.equals(candidateId));
+    return this.candidates.some((c) => c.userInfo.id.equals(candidateId));
   }
 
   getRandomCandidateByStatus(status: CandidateStatus): Candidate | null {
@@ -32,9 +49,36 @@ export class CandidatesCollection {
     return filtered[randomIndex];
   }
 
-  toPersistenceModel() {
-    return this.candidates.map((candidate) => candidate.toPersistenceModel());
+  timeoutProximityVerification(): CandidatesCollection {
+    const updatedCandidates = this.candidates.map((candidate) => {
+      if (candidate.statusIs('proximity-verification-requested')) {
+        candidate.failProximityVerification();
+      }
+      return candidate;
+    });
+    return CandidatesCollection.create(updatedCandidates);
+  }
 
+  notifiedHelpRequest(): CandidatesCollection {
+    const updatedCandidates = this.candidates.map((candidate) => {
+      if (candidate.statusIs('proximity-verification-succeeded')) {
+        candidate.notified();
+      }
+      return candidate;
+    });
+    return CandidatesCollection.create(updatedCandidates);
+  }
+
+  existsByStatus(status: CandidateStatus): boolean {
+    return this.candidates.some((candidate) => candidate.statusIs(status));
+  }
+
+  toPersistenceModel(): { id: string, nickname: string, iconUrl: string, physicalDescription: string, deviceId: string, status: CandidateStatus }[] {
+    return this.candidates.map((candidate) => candidate.toPersistenceModel());
+  }
+
+  toUserInfos(): UserInfo[] {
+    return this.candidates.map((candidate) => candidate.toUserInfo());
   }
 
   public get all(): readonly Candidate[] {
