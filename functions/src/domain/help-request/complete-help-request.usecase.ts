@@ -24,6 +24,6 @@ export class CompleteHelpRequest{
             throw new Error("Such a help request does not exist.")
         }
         const completedHelpRequest = helpRequest.complete()
-        this.helprequestrepository.save(completedHelpRequest)
+        await this.helprequestrepository.save(completedHelpRequest)
      }
 }
