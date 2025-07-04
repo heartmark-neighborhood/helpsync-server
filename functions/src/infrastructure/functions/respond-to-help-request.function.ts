@@ -11,7 +11,7 @@ const respondToHelpRequest = https.onCall(
             throw new https.HttpsError("unauthenticated", "Unauthorized request");
         }
 
-        const imput = RespondToHelpRequestInputSchema.parse(request.data)
+        const input = RespondToHelpRequestInputSchema.parse(request.data)
 
     }
 )
