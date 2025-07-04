@@ -22,7 +22,7 @@ const completeHelp = https.onCall(
         const db = getFirestore()
         const repository = HelpRequestRepository.create(db);
         const usecase = new CompleteHelpRequest(repository);
-        usecase.execute(helpid);
+        await usecase.execute(helpid);
     }
 )
     
