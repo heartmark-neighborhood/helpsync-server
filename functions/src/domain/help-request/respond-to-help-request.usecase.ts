@@ -3,7 +3,7 @@ import { HelpRequestIdSchema } from './help-request-id.value';
 
 export const RespondToHelpRequestInputSchema = z.object({
     helpRequestId : HelpRequestIdSchema,
-    responce : z.string().regex(/accept|decline/,{message :'This parameter only accepts accept or decline'})
+    response : z.string().regex(/accept|decline/,{message :'This parameter only accepts accept or decline'})
 })
 
 export class 
