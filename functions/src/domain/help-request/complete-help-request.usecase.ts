@@ -2,8 +2,6 @@ import {z} from "zod";
 import { HelpRequestId, HelpRequestIdSchema } from "./help-request-id.value";
 import { HelpRequestRepository } from "../../infrastructure/firestore/help-request.repository";
 import { IHelpRequestRepository } from "./i-help-request.repository";
-import { UserRepository } from "../../infrastructure/firestore/User.repository";
-
 export const CompleteHelpInputSchema = z.object({
     helpRequestId : HelpRequestIdSchema,
 }).strict()
