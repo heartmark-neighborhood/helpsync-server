@@ -113,6 +113,40 @@ export class HelpRequest{
     );
   }
 
+  handleProximityVerificationResult(userId: UserId, verificationResult: boolean): HelpRequest {
+    if (this.status !== 'proximity-verification-requested') {
+      throw new Error('Invalid state transition');
+    }
+
+    const updatedCandidates = this.candidatesCollection.handleProximityVerificationResult(userId, verificationResult);
+    if (updatedCandidates.existsByStatus('proximity-verification-succeeded')) {
+      return new HelpRequest(
+        this.id,
+        this.proximityVerificationId,
+        this.requesterId,
+        'proximity-verification-requested',
+        this.location,
+        this.createdAt,
+        this.clock.now(),
+        updatedCandidates,
+        this.proximityCheckDeadline,
+        this.clock
+      );
+    }
+    return new HelpRequest(
+      this.id,
+      this.proximityVerificationId,
+      this.requesterId,
+      'failed',
+      this.location,
+      this.createdAt,
+      this.clock.now(),
+      updatedCandidates,
+      this.proximityCheckDeadline,
+      this.clock
+    );
+  }
+
   timeoutProximityVerification(): HelpRequest {
     if (this.status !== 'proximity-verification-requested') {
       throw new Error('Invalid state transition');
