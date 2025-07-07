@@ -1,6 +1,5 @@
-import {z} from "zod";
+import { z } from "zod";
 import { HelpRequestId, HelpRequestIdSchema } from "./help-request-id.value";
-import { HelpRequestRepository } from "../../infrastructure/firestore/help-request.repository";
 import { IHelpRequestRepository } from "./i-help-request.repository";
 export const CompleteHelpInputSchema = z.object({
     helpRequestId : HelpRequestIdSchema,
@@ -9,19 +8,18 @@ export const CompleteHelpInputSchema = z.object({
 export type CompleteHelpInput = z.infer<typeof CompleteHelpInputSchema>;
 
 export class CompleteHelpRequest{
-     private helprequestid : string
-     private helprequestrepository : IHelpRequestRepository
+     private helpRequestRepository : IHelpRequestRepository
 
      constructor(repository: IHelpRequestRepository){
-        this.helprequestrepository = repository;
+        this.helpRequestRepository = repository;
      }
 
      async execute(helpRequestId: HelpRequestId){
-        const helpRequest = await this.helprequestrepository.findById(helpRequestId)
+        const helpRequest = await this.helpRequestRepository.findById(helpRequestId)
         if(!helpRequest){
             throw new Error("Such a help request does not exist.")
         }
         const completedHelpRequest = helpRequest.complete()
-        await this.helprequestrepository.save(completedHelpRequest)
+        await this.helpRequestRepository.save(completedHelpRequest)
      }
 }
