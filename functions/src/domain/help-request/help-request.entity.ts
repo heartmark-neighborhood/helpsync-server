@@ -29,4 +29,17 @@ export class HelpRequest{
   ): HelpRequest {
     return new HelpRequest(helpRequestId, proximityVerificationId, requesterId, status, [], location, createdAt, updatedAt);
   }
+
+  complete(): HelpRequest {
+    return new HelpRequest(
+      this.id,
+      this.proximityVerificationId,
+      this.requesterId,
+      'COMPLETED',
+      this.matchedSupportersIds,
+      this.location,
+      this.createdAt,
+      new Date()
+    );
+  }
 }
