@@ -96,4 +96,30 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
     return helpRequest;
   }
 
+  getForHandleProximityVerificationResultTest(): HelpRequest {
+    const candidates = CandidatesCollection.create([
+      Candidate.create(
+        {
+          id: UserId.create("supporter1"),
+          nickname: "Supporter 1",
+          iconUrl: "https://example.com/supporter1.png",
+          physicalDescription: "Supporter 1 Description",
+          deviceId: DeviceId.create("supporter1-device1-id")
+        }, 'proximity-verification-requested'),
+    ]);
+    const helpRequest = HelpRequest.create(
+      HelpRequestId.create(),
+      ProximityVerificationId.create(),
+      UserId.create("requester-id"),
+      'proximity-verification-requested',
+      Location.create({ latitude: 35.6895, longitude: 139.6917 }), // Example coordinates
+      this.clock.now(),
+      this.clock.now(),
+      candidates,
+      this.clock.now(),
+      this.clock
+    );
+    this.helpRequests.push(helpRequest);
+    return helpRequest;
+  }
 }
