@@ -181,4 +181,17 @@ export class HelpRequest{
       proximityCheckDeadline: this.proximityCheckDeadline
     };
   }
+
+  complete(): HelpRequest {
+    return new HelpRequest(
+      this.id,
+      this.proximityVerificationId,
+      this.requesterId,
+      'COMPLETED',
+      this.matchedSupportersIds,
+      this.location,
+      this.createdAt,
+      new Date()
+    );
+  }
 }
