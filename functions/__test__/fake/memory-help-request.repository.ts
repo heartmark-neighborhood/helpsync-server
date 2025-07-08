@@ -115,7 +115,24 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
       Location.create({ latitude: 35.6895, longitude: 139.6917 }), // Example coordinates
       this.clock.now(),
       this.clock.now(),
-      candidates,
+      CandidatesCollection.create(),
+      this.clock.now(),
+      this.clock
+    );
+    this.helpRequests.push(helpRequest);
+    return helpRequest;
+  }
+  
+  async getForCompleteTesting(): Promise<HelpRequest> {
+    const helpRequest = HelpRequest.create(
+      HelpRequestId.create(),
+      ProximityVerificationId.create(),
+      UserId.create("requester-id"),
+      'sent',
+      Location.create({ latitude: 35.6895, longitude: 139.6917 }), // Example coordinates
+      this.clock.now(),
+      this.clock.now(),
+      CandidatesCollection.create(),
       this.clock.now(),
       this.clock
     );

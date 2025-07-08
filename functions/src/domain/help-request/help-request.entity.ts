@@ -202,6 +202,23 @@ export class HelpRequest{
     );
   }
 
+
+
+  complete(): HelpRequest {
+    return new HelpRequest(
+      this.id,
+      this.proximityVerificationId,
+      this.requesterId,
+      "completed",
+      this.location,
+      this.createdAt,
+      this.clock.now(),
+      this.candidatesCollection,
+      this.proximityCheckDeadline,
+      this.clock
+    );
+  }
+
   toPersistenceModel() {
     return {
       id: this.id.value,

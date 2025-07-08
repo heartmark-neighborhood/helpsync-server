@@ -15,6 +15,14 @@ export class DeviceId {
     return new DeviceId(value);
   }
 
+  static null(): DeviceId {
+    return new DeviceId('');
+  }
+
+  isNull(): boolean {
+    return this.value === '';
+  }
+
   toString(): string {
     return this.value;
   }

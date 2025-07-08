@@ -22,11 +22,7 @@ export class UserRepository implements IUserRepository {
     throw new Error("Method not implemented.");
   }
 
-  async findAvailableSupporters(location: Location, radiusInM: number): Promise<User[]> {
-    throw new Error("Method not implemented.");
-  }
-
-  async delete(user: User): Promise<void> {
+  async findManyByIds(ids: UserId[]): Promise<User[]> {
     throw new Error("Method not implemented.");
   }
 }

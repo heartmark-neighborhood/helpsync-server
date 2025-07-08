@@ -5,7 +5,6 @@ import { Location } from "../shared/value-object/Location.value";
 
 export interface IUserRepository {
   findById(id: UserId): Promise<User | null>;
-  findAvailableSupporters(location: Location, radiusInM: number): Promise<User[]>;
+  findManyByIds(ids: UserId[]): Promise<User[]>;
   save(user: User): Promise<User>;
-  delete(user: User): Promise<void>;
 }
