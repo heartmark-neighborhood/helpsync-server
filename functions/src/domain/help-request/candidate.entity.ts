@@ -74,14 +74,14 @@ export class Candidate {
     }
     this._status = 'proximity-verification-requested';
   }
-  failProximityVerification(): void {
+  failedProximityVerification(): void {
     if (this._status !== 'proximity-verification-requested') {
       throw new Error('Invalid state transition');
     }
     this._status = 'proximity-verification-failed';
   }
 
-  successProximityVerification(): void {
+  succeedProximityVerification(): void {
     if (this._status !== 'proximity-verification-requested') {
       throw new Error('Invalid state transition');
     }

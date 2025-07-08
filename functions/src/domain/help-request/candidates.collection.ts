@@ -49,10 +49,27 @@ export class CandidatesCollection {
     return filtered[randomIndex];
   }
 
+  handleProximityVerificationResult(
+    userId: UserId,
+    verificationResult: boolean
+  ): CandidatesCollection {
+    const updatedCandidates = this.candidates.map((candidate) => {
+      if (candidate.userInfo.id.equals(userId)) {
+        if (verificationResult) {
+          candidate.succeedProximityVerification();
+        } else {
+          candidate.failedProximityVerification();
+        }
+      }
+      return candidate;
+    });
+    return CandidatesCollection.create(updatedCandidates);
+  }
+
   timeoutProximityVerification(): CandidatesCollection {
     const updatedCandidates = this.candidates.map((candidate) => {
       if (candidate.statusIs('proximity-verification-requested')) {
-        candidate.failProximityVerification();
+        candidate.failedProximityVerification();
       }
       return candidate;
     });
