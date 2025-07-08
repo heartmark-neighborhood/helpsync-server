@@ -115,7 +115,7 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
       Location.create({ latitude: 35.6895, longitude: 139.6917 }), // Example coordinates
       this.clock.now(),
       this.clock.now(),
-      CandidatesCollection.create(),
+      candidates,
       this.clock.now(),
       this.clock
     );
