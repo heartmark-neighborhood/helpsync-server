@@ -16,7 +16,7 @@ describe('近接確認結果通知の処理', () => {
       userId: candidate.userInfo.id.value,
       verificationResult: true,
     });
-    usecase.execute(command);
+    await usecase.execute(command);
 
     const result = await repository.findWithRequesterInfoById(helpRequest.id);
     if(!result) {
@@ -47,7 +47,7 @@ describe('近接確認結果通知の処理', () => {
       userId: candidate.userInfo.id.value,
       verificationResult: false,
     });
-    usecase.execute(command);
+    await usecase.execute(command);
 
     const result = await repository.findWithRequesterInfoById(helpRequest.id);
     if(!result) {

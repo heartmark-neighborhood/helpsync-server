@@ -10,7 +10,7 @@ import { SystemClock } from "../service/SystemClock";
 
 
 
-const completeHelp = https.onCall(
+export const completeHelp = https.onCall(
     async (request) => {
         logger.info("Received create help request call", { uid: request.auth?.uid, data: request.data });
         if(!request.auth) {
