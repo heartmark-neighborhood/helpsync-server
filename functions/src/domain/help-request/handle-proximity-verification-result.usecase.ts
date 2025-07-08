@@ -46,7 +46,7 @@ export class HandleProximityVerificationResultUseCase {
         throw new Error('Failed to handle proximity verification result');
       }
 
-      this.repository.save(updateHelpRequest);
+      await this.repository.save(updateHelpRequest);
       console.log(`Proximity verification result for user ${userId.value} processed successfully.`);
     } catch (error) {
       console.error('Error handling proximity verification result:', error);
