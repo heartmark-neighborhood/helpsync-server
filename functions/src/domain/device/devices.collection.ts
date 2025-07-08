@@ -1,3 +1,4 @@
+import { UserId } from "../user/user-id.value";
 import { Device } from "./device.entity";
 
 export class DevicesCollection {
@@ -9,6 +10,11 @@ export class DevicesCollection {
 
   addAll(devices: Device[]): void {
     devices.forEach(device => this.add(device));
+  }
+
+  getByOwnerId(ownerId: UserId): Device | null {
+    const device = this.devices.find(device => device.ownerId.value === ownerId.value);
+    return device || null;
   }
 
   toUniqueLatest(): DevicesCollection {

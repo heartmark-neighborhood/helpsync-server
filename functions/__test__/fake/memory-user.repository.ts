@@ -1,7 +1,6 @@
 import { IUserRepository } from '../../src/domain/user/i-user.repository';
 import { User } from '../../src/domain/user/User.entity';
 import { UserId } from '../../src/domain/user/user-id.value';
-import { Location } from '../../src/domain/shared/value-object/Location.value';
 import { TestClock } from './test-clock.service';
 
 export class MemoryUserRepository implements IUserRepository {
@@ -56,16 +55,13 @@ export class MemoryUserRepository implements IUserRepository {
     }
     return user;
   }
+
   async findById(id: UserId): Promise<User | null> {
     const user = this.users.find(u => u.id.equals(id));
     return user || null;
   }
 
-  async delete(user: User): Promise<void> {
-    this.users = this.users.filter(u => !u.id.equals(user.id));
-  }
-
-  async findAvailableSupporters(location: Location, radiusInM: number): Promise<User[]> {
-    return [this.supporter1, this.supporter2];
+  async findManyByIds(ids: UserId[]): Promise<User[]> {
+    return this.users.filter(user => ids.some(id => user.id.equals(id)));
   }
 }
