@@ -14,6 +14,7 @@ import { Candidate } from "./candidate.entity";
 import { IProximityVerificationTimeoutScheduler } from "./service/i-proximity-verfication-timeout.scheduler";
 import { IDeviceRepository } from "../device/i-device.repository";
 import { DeviceId, DeviceIdSchema } from "../device/device-id.value";
+import { UserInfo } from "./user-info.dto";
 
 export const CreateHelpRequestInputSchema = z.object({
   location: LocationSchema,
@@ -76,18 +77,27 @@ export class CreateHelpRequestUseCase {
     }
 
     const nearByDeviceUniqueLatest = nearByDevice.toUniqueLatest();
+    const userIds = nearByDeviceUniqueLatest.all.map(device => device.ownerId);
+    const users = await this.userRepository.findManyByIds(userIds);
     let candidates = CandidatesCollection.create();
-    nearByDeviceUniqueLatest.all.forEach(device => {
-      candidates = candidates.add(Candidate.create(device.ownerId, device.id));
-    });
+    for (const user of users) {
+      const device = nearByDeviceUniqueLatest.getByOwnerId(user.id);
+      if (device) {
+        const userInfo = UserInfo.fromUser(user, device.id);
+        const candidate = Candidate.create(
+          userInfo,
+          "pending",
+        );
+        candidates = candidates.add(candidate);
+      }
+    }
+    const addedHelpRequest = helpRequest.addCandidates(candidates);
 
     const requesterDevice = await this.deviceRepository.findById(command.deviceId);
     if (!requesterDevice) {
       throw new Error(`Device with ID ${command.deviceId.value} does not exist.`);
     }
     const deviceToNotify = [...nearByDeviceUniqueLatest.all, requesterDevice];
-
-    const addedHelpRequest = helpRequest.addCandidates(candidates);
 
     const proximityVerificationId = addedHelpRequest.proximityVerificationId;
     const expiredAt = addMinutes(command.clock.now(), 1); // 1 minute expiration

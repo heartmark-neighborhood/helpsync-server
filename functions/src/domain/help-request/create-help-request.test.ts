@@ -64,12 +64,13 @@ describe('ヘルプ要請作成要求', () => {
     expect(helpRequest.location.longitude).toBe(139.6917);
     expect(helpRequest.createdAt).toBeDefined();
     expect(helpRequest.updatedAt).toBeDefined();
+
     expect(helpRequest.status).toBe('proximity-verification-requested'); // 初期状態は 'proximity-verification-requested'
     expect(helpRequest.candidatesCollection).toBeDefined();
     expect(candidates.length).toBe(2);
-    expect(candidates[0].candidateId.value).toBe('supporter1-id');
+    expect(candidates[0].userInfo.id.value).toBe('supporter1-id');
     expect(candidates[0].statusIs("proximity-verification-requested")).toBe(true);
-    expect(candidates[1].candidateId.value).toBe('supporter2-id');
+    expect(candidates[1].userInfo.id.value).toBe('supporter2-id');
     expect(candidates[1].statusIs("proximity-verification-requested")).toBe(true);
 
     expect(helpRequest.proximityVerificationId).toBeDefined();
