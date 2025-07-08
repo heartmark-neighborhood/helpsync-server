@@ -15,10 +15,11 @@ export class CompleteHelpRequest{
      }
 
      async execute(helpRequestId: HelpRequestId){
-        const helpRequest = await this.helpRequestRepository.findById(helpRequestId)
-        if(!helpRequest){
+        const helpRequestWithRequesterInfo = await this.helpRequestRepository.findWithRequesterInfoById(helpRequestId)
+        if(!helpRequestWithRequesterInfo){
             throw new Error("Such a help request does not exist.")
         }
+        const { helpRequest } = helpRequestWithRequesterInfo;
         const completedHelpRequest = helpRequest.complete()
         await this.helpRequestRepository.save(completedHelpRequest)
      }
