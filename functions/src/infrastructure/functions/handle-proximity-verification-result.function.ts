@@ -11,7 +11,7 @@ export const handleProximityVerificationResult = https.onCall(async (request) =>
 
   const validationResult = HandleProximityVerificationResultInputSchema.safeParse(request.data);
   if (!validationResult.success) {
-    throw new https.HttpsError("invalid-argument", "Invalid request data");
+    throw new https.HttpsError("invalid-argument", `Invalid request data: ${validationResult.error.message}`);
   }
 
   console.log("Proximity verification result received:", request.data);
