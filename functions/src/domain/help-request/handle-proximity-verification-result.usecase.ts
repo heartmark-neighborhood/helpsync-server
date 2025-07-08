@@ -30,7 +30,7 @@ export class HandleProximityVerificationResultCommand {
 }
 
 
-class HandleProximityVerificationResultUseCase {
+export class HandleProximityVerificationResultUseCase {
   constructor(private readonly repository: IHelpRequestRepository) {}
 
   async execute(input: HandleProximityVerificationResultCommand): Promise<void> {
