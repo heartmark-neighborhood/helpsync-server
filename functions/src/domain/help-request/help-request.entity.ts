@@ -137,7 +137,7 @@ export class HelpRequest{
       this.id,
       this.proximityVerificationId,
       this.requesterId,
-      'failed',
+      'proximity-verification-requested',
       this.location,
       this.createdAt,
       this.clock.now(),
