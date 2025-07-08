@@ -7,7 +7,7 @@ export const CompleteHelpInputSchema = z.object({
 
 export type CompleteHelpInput = z.infer<typeof CompleteHelpInputSchema>;
 
-export class CompleteHelpRequest{
+export class CompleteHelpRequestUsecase{
      private helpRequestRepository : IHelpRequestRepository
 
      constructor(repository: IHelpRequestRepository){
