@@ -34,7 +34,7 @@ export class UpdateDeviceLocationUseCase {
   async execute(command: UpdateDeviceLocationCommand): Promise<void> {
     const device = await this.repository.findById(command.deviceId);
     if (!device) {
-      throw new Error(`Device with ID ${command.deviceId.value} not found`);
+      throw new NotFoundError(`Device with ID ${command.deviceId.value} not found`);
     }
 
     const updatedDevice = device.movedTo(command.location);
