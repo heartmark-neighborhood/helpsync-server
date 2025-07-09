@@ -28,9 +28,6 @@ export class DeviceId {
   }
 
   equals(other: DeviceId): boolean {
-    if (!(other instanceof DeviceId)) {
-      return false;
-    }
     return this.value === other.value;
   }
 }
