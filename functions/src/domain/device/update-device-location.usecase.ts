@@ -1,7 +1,7 @@
-import { Location, LocationSchema } from "../shared/value-object/Location.value";
-import { DeviceId, DeviceIdSchema } from "./device-id.value";
-import { IDeviceRepository } from "./i-device.repository";
-import { z } from "zod";
+import {Location, LocationSchema} from "../shared/value-object/Location.value";
+import {DeviceId, DeviceIdSchema} from "./device-id.value";
+import {IDeviceRepository} from "./i-device.repository";
+import {z} from "zod";
 
 export const UpdateDeviceLocationInputSchema = z.object({
   deviceId: DeviceIdSchema,
@@ -34,7 +34,7 @@ export class UpdateDeviceLocationUseCase {
   async execute(command: UpdateDeviceLocationCommand): Promise<void> {
     const device = await this.repository.findById(command.deviceId);
     if (!device) {
-      throw new NotFoundError(`Device with ID ${command.deviceId.value} not found`);
+      throw new Error(`Device with ID ${command.deviceId.value} not found`);
     }
 
     const updatedDevice = device.movedTo(command.location);

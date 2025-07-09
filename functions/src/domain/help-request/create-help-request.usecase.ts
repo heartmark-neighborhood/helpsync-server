@@ -1,24 +1,23 @@
-import { LocationSchema } from "../shared/value-object/Location.value";
-import { IUserRepository } from "../user/i-user.repository";
-import { UserId } from "../user/user-id.value";
-import { HelpRequest } from "./help-request.entity";
-import { IHelpRequestRepository } from "./i-help-request.repository";
-import { IProximityVerificationNotifier } from "./service/i-proximity-verification.notifier";
-import { Location } from "../shared/value-object/Location.value";
+import {LocationSchema, Location} from "../shared/value-object/Location.value";
+import {IUserRepository} from "../user/i-user.repository";
+import {UserId} from "../user/user-id.value";
+import {HelpRequest} from "./help-request.entity";
+import {IHelpRequestRepository} from "./i-help-request.repository";
+import {IProximityVerificationNotifier} from "./service/i-proximity-verification.notifier";
 
-import { z } from "zod";
-import { addMinutes } from "date-fns"; 
-import { IClock } from "../shared/service/i-clock.service";
-import { CandidatesCollection } from "./candidates.collection";
-import { Candidate } from "./candidate.entity";
-import { IProximityVerificationTimeoutScheduler } from "./service/i-proximity-verfication-timeout.scheduler";
-import { IDeviceRepository } from "../device/i-device.repository";
-import { DeviceId, DeviceIdSchema } from "../device/device-id.value";
-import { UserInfo } from "./user-info.dto";
+import {z} from "zod";
+import {addMinutes} from "date-fns";
+import {IClock} from "../shared/service/i-clock.service";
+import {CandidatesCollection} from "./candidates.collection";
+import {Candidate} from "./candidate.entity";
+import {IProximityVerificationTimeoutScheduler} from "./service/i-proximity-verfication-timeout.scheduler";
+import {IDeviceRepository} from "../device/i-device.repository";
+import {DeviceId, DeviceIdSchema} from "../device/device-id.value";
+import {UserInfo} from "./user-info.dto";
 
 export const CreateHelpRequestInputSchema = z.object({
   location: LocationSchema,
-  deviceId: DeviceIdSchema
+  deviceId: DeviceIdSchema,
 }).strict();
 
 
@@ -43,15 +42,14 @@ export class CreateHelpRequestCommand {
 }
 
 
-
 export class CreateHelpRequestUseCase {
   public async execute(command: CreateHelpRequestCommand): Promise<HelpRequest> {
-    const { requesterId } = command;
+    const {requesterId} = command;
 
     const requester = await this.userRepository.findById(requesterId);
     if (!requester) {
       throw new Error(`User with ID ${requesterId.value} does not exist.`);
-    } 
+    }
     if (!command.location) {
       throw new Error("Location is required.");
     }
@@ -77,7 +75,7 @@ export class CreateHelpRequestUseCase {
     }
 
     const nearByDeviceUniqueLatest = nearByDevice.toUniqueLatest();
-    const userIds = nearByDeviceUniqueLatest.all.map(device => device.ownerId);
+    const userIds = nearByDeviceUniqueLatest.all.map((device) => device.ownerId);
     const users = await this.userRepository.findManyByIds(userIds);
     let candidates = CandidatesCollection.create();
     for (const user of users) {

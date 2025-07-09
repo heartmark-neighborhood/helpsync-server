@@ -1,7 +1,7 @@
-import { IUserRepository } from "../../domain/user/i-user.repository"; 
-import { User } from "../../domain/user/User.entity";
-import { UserId } from "../../domain/user/user-id.value";
-import { Location } from "../../domain/shared/value-object/Location.value";
+import {IUserRepository} from "../../domain/user/i-user.repository";
+import {User} from "../../domain/user/User.entity";
+import {UserId} from "../../domain/user/user-id.value";
+import {Location} from "../../domain/shared/value-object/Location.value";
 
 export class UserRepository implements IUserRepository {
   private db: FirebaseFirestore.Firestore;

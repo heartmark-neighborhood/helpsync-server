@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import {z} from "zod";
 
 // Define a Zod schema for validating device IDs
-export const DeviceIdSchema = z.string().min(1, 'Device ID must not be empty');
+export const DeviceIdSchema = z.string().min(1, "Device ID must not be empty");
 
 export class DeviceId {
   private constructor(
@@ -9,18 +9,18 @@ export class DeviceId {
   ) {}
 
   static create(value: string): DeviceId {
-    if (!value || typeof value !== 'string') {
-      throw new Error('Invalid device ID');
+    if (!value || typeof value !== "string") {
+      throw new Error("Invalid device ID");
     }
     return new DeviceId(value);
   }
 
   static null(): DeviceId {
-    return new DeviceId('');
+    return new DeviceId("");
   }
 
   isNull(): boolean {
-    return this.value === '';
+    return this.value === "";
   }
 
   toString(): string {

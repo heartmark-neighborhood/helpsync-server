@@ -1,8 +1,8 @@
-import { z } from "zod";
+import {z} from "zod";
 
-import { HelpRequestId, HelpRequestIdSchema } from "./help-request-id.value";
-import { IHelpRequestRepository } from "./i-help-request.repository";
-import { IHelpRequestNotifier } from "./service/i-help-request.notifier";
+import {HelpRequestId, HelpRequestIdSchema} from "./help-request-id.value";
+import {IHelpRequestRepository} from "./i-help-request.repository";
+import {IHelpRequestNotifier} from "./service/i-help-request.notifier";
 
 export const ProximityVerificationTimeoutInputSchema = z.object({
   helpRequestId: HelpRequestIdSchema,
@@ -23,13 +23,13 @@ export class ProximityVerificationTimeoutCommand {
 
 export class ProximityVerificationTimeoutUseCase {
   public async execute(command: ProximityVerificationTimeoutCommand): Promise<void> {
-    const { helpRequestId } = command;
+    const {helpRequestId} = command;
 
     const helpRequestWithRequesterInfo = await this.helpRequestRepository.findWithRequesterInfoById(helpRequestId);
     if (!helpRequestWithRequesterInfo) {
       throw new Error(`Help request with ID ${helpRequestId.value} not found`);
     }
-    const { helpRequest, requester } = helpRequestWithRequesterInfo;
+    const {helpRequest, requester} = helpRequestWithRequesterInfo;
 
     const timeoutedHelpRequest = helpRequest.timeoutProximityVerification();
     const candidatesToNotify = timeoutedHelpRequest.candidatesCollection.withStatus("proximity-verification-succeeded");

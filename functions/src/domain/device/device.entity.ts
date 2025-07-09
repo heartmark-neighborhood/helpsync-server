@@ -1,15 +1,15 @@
-import { Location } from "../shared/value-object/Location.value";
-import { DeviceToken } from "./device-token.value";
-import { UserId } from "../user/user-id.value";
-import { IClock } from "../shared/service/i-clock.service";
-import { DeviceId } from "./device-id.value";
+import {Location} from "../shared/value-object/Location.value";
+import {DeviceToken} from "./device-token.value";
+import {UserId} from "../user/user-id.value";
+import {IClock} from "../shared/service/i-clock.service";
+import {DeviceId} from "./device-id.value";
 
-export class Device{
+export class Device {
   private constructor(
     readonly id: DeviceId,
     readonly ownerId: UserId,
     readonly deviceToken: DeviceToken,
-    readonly location: Location, 
+    readonly location: Location,
     readonly lastUpdatedAt: Date,
     readonly clock: IClock
   ) {}
@@ -18,7 +18,7 @@ export class Device{
     id: DeviceId,
     ownerId: UserId,
     deviceToken: DeviceToken,
-    location: Location = Location.create({ latitude: 0, longitude: 0 }), // Default location
+    location: Location = Location.create({latitude: 0, longitude: 0}), // Default location
     lastSeen: Date,
     clock: IClock
   ): Device {
