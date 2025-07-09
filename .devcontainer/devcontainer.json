@@ -5,7 +5,12 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 	"features": {
-		"ghcr.io/devcontainers-extra/features/firebase-cli:2": {}
+		"ghcr.io/devcontainers-extra/features/firebase-cli:2": {},
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "17", // FirestoreエミュレータにはJava 11以上を推奨
+			"installMaven": false, // Mavenは不要なのでfalse
+			"installGradle": false // Gradleは不要なのでfalse
+		}
 	},
 	"forwardPorts": [
 		9099,
