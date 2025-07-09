@@ -29,7 +29,7 @@ export class Device{
     return this.id.equals(other.id);
   }
 
-  moveTo(location: Location): Device {
+  movedTo(location: Location): Device {
     return new Device(
       this.id,
       this.ownerId,

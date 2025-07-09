@@ -38,4 +38,8 @@ export class Location {
       geohash: this.calcGeohash()
     };
   }
+
+  public equals(other: Location): boolean {
+    return this.latitude === other.latitude && this.longitude === other.longitude;
+  }
 }
