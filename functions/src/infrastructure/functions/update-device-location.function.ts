@@ -8,7 +8,7 @@ import { SystemClock } from '../service/SystemClock';
 
 const updateDeviceLocation = https.onCall(async (request) => {
   if(!request.auth){
-    throw new https.HttpsError('unauthenticated', 'Unauthorized request');
+    throw new https.HttpsError('unauthenticated', 'Unauthenticated request');
   }
 
   const firestore = getFirestore();
