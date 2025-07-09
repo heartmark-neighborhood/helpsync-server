@@ -6,7 +6,7 @@ import { DeviceRepository } from '../firestore/device.repository';
 import { SystemClock } from '../service/SystemClock';
 
 
-const updateDeviceLocation = https.onCall(async (request) => {
+export const updateDeviceLocation = https.onCall(async (request) => {
   if(!request.auth){
     throw new https.HttpsError('unauthenticated', 'Unauthenticated request');
   }
