@@ -88,8 +88,8 @@ export class MemoryDeviceRepository implements IDeviceRepository {
     ]);
   }
 
-  async findById(): Promise<Device | null> {
-    const device = this.devices.find(d => d.id.equals(DeviceId.create('requester-device-id')));
+  async findById(deviceId: DeviceId): Promise<Device | null> {
+    const device = this.devices.find(d => d.id.equals(deviceId));
     return device || null;
   }
 
