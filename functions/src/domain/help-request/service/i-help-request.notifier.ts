@@ -1,5 +1,5 @@
-import { DeviceId } from "../../device/device-id.value";
-import { UserInfo } from "../user-info.dto";
+import {DeviceId} from "../../device/device-id.value";
+import {UserInfo} from "../user-info.dto";
 
 export interface IHelpRequestNotifier {
   notifyRequesterOfMatches(targetDeviceId: DeviceId, requesterInfo: UserInfo): Promise<void>;

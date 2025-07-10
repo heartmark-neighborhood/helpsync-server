@@ -1,34 +1,34 @@
-import { Location } from "../shared/value-object/Location.value";
-import { UserId } from "../user/user-id.value";
-import { CandidatesCollection } from "./candidates.collection";
-import { HelpRequestId } from "./help-request-id.value";
-import { ProximityVerificationId } from "./proximity-verification-id.value";
-import { IClock } from "../shared/service/i-clock.service";
+import {Location} from "../shared/value-object/Location.value";
+import {UserId} from "../user/user-id.value";
+import {CandidatesCollection} from "./candidates.collection";
+import {HelpRequestId} from "./help-request-id.value";
+import {ProximityVerificationId} from "./proximity-verification-id.value";
+import {IClock} from "../shared/service/i-clock.service";
 
-import { z } from "zod";
-import { addMinutes } from "date-fns";
+import {z} from "zod";
+import {addMinutes} from "date-fns";
 
 export const HelpRequestStatusSchema = z.enum([
-  'pending',
-  'proximity-verification-requested',
-  'matched',
-  'sent',
-  'completed',
-  'failed',
-  'canceled'
+  "pending",
+  "proximity-verification-requested",
+  "matched",
+  "sent",
+  "completed",
+  "failed",
+  "canceled",
 ], {
   errorMap: (issue, ctx) => {
-    if (issue.code === 'invalid_enum_value') {
-      return { message: `Invalid help request status: ${ctx.data}` };
+    if (issue.code === "invalid_enum_value") {
+      return {message: `Invalid help request status: ${ctx.data}`};
     }
-    return { message: ctx.defaultError };
-  }
+    return {message: ctx.defaultError};
+  },
 });
 
 export type HelpRequestStatus = z.infer<typeof HelpRequestStatusSchema>;
 
 
-export class HelpRequest{
+export class HelpRequest {
   private constructor(
     readonly id: HelpRequestId,
     readonly proximityVerificationId: ProximityVerificationId,
@@ -40,7 +40,7 @@ export class HelpRequest{
     readonly candidatesCollection: CandidatesCollection,
     readonly proximityCheckDeadline: Date,
     private readonly clock: IClock
-  ){}
+  ) {}
 
   static create(
     helpRequestId: HelpRequestId,
@@ -55,13 +55,13 @@ export class HelpRequest{
     clock: IClock
   ): HelpRequest {
     return new HelpRequest(
-      helpRequestId, 
-      proximityVerificationId, 
-      requesterId, 
-      status, 
-      location, 
-      createdAt, 
-      updatedAt, 
+      helpRequestId,
+      proximityVerificationId,
+      requesterId,
+      status,
+      location,
+      createdAt,
+      updatedAt,
       candidates,
       proximityCheckDeadline,
       clock
@@ -85,12 +85,12 @@ export class HelpRequest{
   }
 
   requestedProximityVerification(): HelpRequest {
-    if (this.status !== 'pending') {
-      throw new Error('Invalid state transition');
+    if (this.status !== "pending") {
+      throw new Error("Invalid state transition");
     }
 
-    const updatedCandidates = this.candidatesCollection.all.map(candidate => {
-      if (candidate.statusIs('pending')) {
+    const updatedCandidates = this.candidatesCollection.all.map((candidate) => {
+      if (candidate.statusIs("pending")) {
         candidate.requestProximityVerification();
       }
       return candidate;
@@ -103,7 +103,7 @@ export class HelpRequest{
       this.id,
       this.proximityVerificationId,
       this.requesterId,
-      'proximity-verification-requested',
+      "proximity-verification-requested",
       this.location,
       this.createdAt,
       this.clock.now(),
@@ -114,17 +114,17 @@ export class HelpRequest{
   }
 
   handleProximityVerificationResult(userId: UserId, verificationResult: boolean): HelpRequest {
-    if (this.status !== 'proximity-verification-requested') {
-      throw new Error('Invalid state transition');
+    if (this.status !== "proximity-verification-requested") {
+      throw new Error("Invalid state transition");
     }
 
     const updatedCandidates = this.candidatesCollection.handleProximityVerificationResult(userId, verificationResult);
-    if (updatedCandidates.existsByStatus('proximity-verification-succeeded')) {
+    if (updatedCandidates.existsByStatus("proximity-verification-succeeded")) {
       return new HelpRequest(
         this.id,
         this.proximityVerificationId,
         this.requesterId,
-        'proximity-verification-requested',
+        "proximity-verification-requested",
         this.location,
         this.createdAt,
         this.clock.now(),
@@ -137,7 +137,7 @@ export class HelpRequest{
       this.id,
       this.proximityVerificationId,
       this.requesterId,
-      'proximity-verification-requested',
+      "proximity-verification-requested",
       this.location,
       this.createdAt,
       this.clock.now(),
@@ -148,17 +148,17 @@ export class HelpRequest{
   }
 
   timeoutProximityVerification(): HelpRequest {
-    if (this.status !== 'proximity-verification-requested') {
-      throw new Error('Invalid state transition');
+    if (this.status !== "proximity-verification-requested") {
+      throw new Error("Invalid state transition");
     }
 
     const updatedCandidates = this.candidatesCollection.timeoutProximityVerification();
-    if(updatedCandidates.existsByStatus('proximity-verification-succeeded')) {
+    if (updatedCandidates.existsByStatus("proximity-verification-succeeded")) {
       return new HelpRequest(
         this.id,
         this.proximityVerificationId,
         this.requesterId,
-        'matched',
+        "matched",
         this.location,
         this.createdAt,
         this.clock.now(),
@@ -171,7 +171,7 @@ export class HelpRequest{
       this.id,
       this.proximityVerificationId,
       this.requesterId,
-      'failed',
+      "failed",
       this.location,
       this.createdAt,
       this.clock.now(),
@@ -203,7 +203,6 @@ export class HelpRequest{
   }
 
 
-
   complete(): HelpRequest {
     return new HelpRequest(
       this.id,
@@ -229,7 +228,7 @@ export class HelpRequest{
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       candidates: this.candidatesCollection.toPersistenceModel(),
-      proximityCheckDeadline: this.proximityCheckDeadline
+      proximityCheckDeadline: this.proximityCheckDeadline,
     };
   }
 }

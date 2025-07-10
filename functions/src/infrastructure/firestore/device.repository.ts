@@ -1,21 +1,21 @@
-import { IDeviceRepository } from "../../domain/device/i-device.repository";
-import { Device } from "../../domain/device/device.entity";
-import { Location } from "../../domain/shared/value-object/Location.value";
+import {IDeviceRepository} from "../../domain/device/i-device.repository";
+import {Device} from "../../domain/device/device.entity";
+import {Location} from "../../domain/shared/value-object/Location.value";
 
-import { geohashQueryBounds, distanceBetween } from 'geofire-common';
-import * as FirebaseFirestore from '@google-cloud/firestore';
+import {geohashQueryBounds, distanceBetween} from "geofire-common";
+import * as FirebaseFirestore from "@google-cloud/firestore";
 import {
   getFirestore,
   Query,
   DocumentData,
   QuerySnapshot,
   GeoPoint,
-} from 'firebase-admin/firestore'; 
-import { DeviceToken } from "../../domain/device/device-token.value";
-import { UserId } from "../../domain/user/user-id.value";
-import { IClock } from "../../domain/shared/service/i-clock.service";
-import { DeviceId } from "../../domain/device/device-id.value";
-import { DevicesCollection } from "../../domain/device/devices.collection";
+} from "firebase-admin/firestore";
+import {DeviceToken} from "../../domain/device/device-token.value";
+import {UserId} from "../../domain/user/user-id.value";
+import {IClock} from "../../domain/shared/service/i-clock.service";
+import {DeviceId} from "../../domain/device/device-id.value";
+import {DevicesCollection} from "../../domain/device/devices.collection";
 export class DeviceRepository implements IDeviceRepository {
   private constructor(
     private readonly db: FirebaseFirestore.Firestore,
@@ -29,10 +29,10 @@ export class DeviceRepository implements IDeviceRepository {
   }
 
   async save(device: Device): Promise<Device> {
-    const docRef = this.db.collection('users')
-                    .doc(device.ownerId.toString())
-                    .collection('devices')
-                    .doc(device.id.toString());
+    const docRef = this.db.collection("users")
+      .doc(device.ownerId.toString())
+      .collection("devices")
+      .doc(device.id.toString());
 
     const deviceData = {
       ownerId: device.ownerId.toString(),
@@ -40,7 +40,7 @@ export class DeviceRepository implements IDeviceRepository {
       location: new GeoPoint(device.location.latitude, device.location.longitude),
       geohash: device.location.calcGeohash(),
       lastUpdatedAt: this.clock.now(),
-    }
+    };
     await docRef.set(deviceData);
     return device;
   }
@@ -52,11 +52,11 @@ export class DeviceRepository implements IDeviceRepository {
     const bounds = geohashQueryBounds([center.latitude, center.longitude], radiusInM);
 
     const promises: Promise<QuerySnapshot<DocumentData>>[] = [];
-    
+
     for (const b of bounds) {
       const q: Query<DocumentData> = this.db
-        .collectionGroup('devices') // ★★★ this.db.collectionGroup() でクエリを開始 ★★★
-        .orderBy('geohash')
+        .collectionGroup("devices") // ★★★ this.db.collectionGroup() でクエリを開始 ★★★
+        .orderBy("geohash")
         .startAt(b[0])
         .endAt(b[1]);
       promises.push(q.get()); // ★★★ メソッド名が getDocs から get に変わる ★★★
@@ -75,7 +75,7 @@ export class DeviceRepository implements IDeviceRepository {
     const finalResults = DevicesCollection.create();
     for (const [id, data] of matchingDocs.entries()) {
       const docLocation = data.location as GeoPoint;
-      
+
       const distanceInM = distanceBetween(
         [docLocation.latitude, docLocation.longitude],
         [center.latitude, center.longitude]
@@ -86,7 +86,7 @@ export class DeviceRepository implements IDeviceRepository {
           DeviceId.create(id),
           UserId.create(data.ownerId),
           DeviceToken.create(data.fcmToken),
-          Location.create({ latitude: docLocation.latitude, longitude: docLocation.longitude }),
+          Location.create({latitude: docLocation.latitude, longitude: docLocation.longitude}),
           new Date(data.lastUpdatedAt),
           this.clock
         ));
@@ -97,7 +97,7 @@ export class DeviceRepository implements IDeviceRepository {
   }
 
   async findById(deviceId: DeviceId): Promise<Device | null> {
-    const snapshot = await this.db.collectionGroup('devices').where('id', '==', deviceId.value).get();
+    const snapshot = await this.db.collectionGroup("devices").where("id", "==", deviceId.value).get();
     if (snapshot.empty) {
       return null;
     }

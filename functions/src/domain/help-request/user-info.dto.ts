@@ -1,15 +1,15 @@
-import { DeviceId, DeviceIdSchema } from "../device/device-id.value";
-import { UserId, UserIdSchema } from "../user/user-id.value";
+import {DeviceId, DeviceIdSchema} from "../device/device-id.value";
+import {UserId, UserIdSchema} from "../user/user-id.value";
 
-import { z } from "zod";
-import { User } from "../user/User.entity";
+import {z} from "zod";
+import {User} from "../user/User.entity";
 
 export const UserInfoSchema = z.object({
   id: UserIdSchema,
   nickname: z.string(),
   physicalDescription: z.string(),
   iconUrl: z.string(),
-  deviceId: DeviceIdSchema
+  deviceId: DeviceIdSchema,
 });
 
 export type UserInfoDTO = z.infer<typeof UserInfoSchema>;
@@ -46,5 +46,4 @@ export class UserInfo {
       deviceId
     );
   }
-
 }

@@ -1,5 +1,5 @@
-import { UserId } from "../user/user-id.value";
-import { Device } from "./device.entity";
+import {UserId} from "../user/user-id.value";
+import {Device} from "./device.entity";
 
 export class DevicesCollection {
   private devices: Device[] = [];
@@ -9,17 +9,17 @@ export class DevicesCollection {
   }
 
   addAll(devices: Device[]): void {
-    devices.forEach(device => this.add(device));
+    devices.forEach((device) => this.add(device));
   }
 
   getByOwnerId(ownerId: UserId): Device | null {
-    const device = this.devices.find(device => device.ownerId.value === ownerId.value);
+    const device = this.devices.find((device) => device.ownerId.value === ownerId.value);
     return device || null;
   }
 
   toUniqueLatest(): DevicesCollection {
-    const uniqueDevices = new Map<String, Device>();
-    this.devices.forEach(device => {
+    const uniqueDevices = new Map<string, Device>();
+    this.devices.forEach((device) => {
       const existingDevice = uniqueDevices.get(device.ownerId.value);
       if (!existingDevice || device.lastUpdatedAt > existingDevice.lastUpdatedAt) {
         uniqueDevices.set(device.ownerId.value, device);
@@ -45,5 +45,4 @@ export class DevicesCollection {
   static create(devices: Device[] = []): DevicesCollection {
     return new DevicesCollection(devices);
   }
-
 }

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Callable Function Test</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js"></script>
+</head>
+<body>
+  <h1>Callable Function Test</h1>
+  <button onclick="callCreateHelpRequest()">Call createHelpRequest</button>
+  <script>
+    // Initialize Firebase
+    // IMPORTANT: Replace with your actual Firebase project config
+    const firebaseConfig = {
+      apiKey: "your-api-key",
+      authDomain: "heartmark-neighborhood.firebaseapp.com",
+      projectId: "heartmark-neighborhood",
+      storageBucket: "heartmark-neighborhood.appspot.com",
+      messagingSenderId: "your-sender-id",
+      appId: "your-app-id"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Point to the emulators
+    const functions = firebase.functions();
+    functions.useEmulator("localhost", 5001);
+
+    const auth = firebase.auth();
+    auth.useEmulator("http://localhost:9099");
+
+
+    async function callCreateHelpRequest() {
+      try {
+        // You might need to sign in a test user first if your function requires authentication
+        await auth.signInAnonymously();
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("Not signed in!");
+            return;
+        }
+        
+        console.log("Calling createHelpRequest as user:", user.uid);
+
+        const createHelpRequest = functions.httpsCallable('createHelpRequest');
+        const result = await createHelpRequest({
+          location: {
+            latitude: 35.681236,
+            longitude: 139.767125
+          },
+          deviceId: "test-device-from-client"
+        });
+        
+        console.log("Function result:", result);
+        alert("Function called successfully! Check console for result.");
+      } catch (error) {
+        console.error("Error calling function:", error);
+        alert("Error calling function: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,12 +1,12 @@
-import { z } from 'zod';
+import {z} from "zod";
 
 export const UserIdSchema = z
   .string({
-    required_error: 'User ID is required.',
-    invalid_type_error: 'User ID must be a string.',
+    required_error: "User ID is required.",
+    invalid_type_error: "User ID must be a string.",
   })
-  .min(1, { message: 'User ID cannot be empty.' }) 
-  .max(128, { message: 'User ID is too long.' }); 
+  .min(1, {message: "User ID cannot be empty."})
+  .max(128, {message: "User ID is too long."});
 
 export type UserIdPersistenceModel = z.infer<typeof UserIdSchema>;
 

@@ -1,10 +1,10 @@
-import { z } from 'zod';
-import { geohashForLocation, geohashQueryBounds } from 'geofire-common';
+import {z} from "zod";
+import {geohashForLocation, geohashQueryBounds} from "geofire-common";
 
 export const LocationSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  geohash: z.string().optional()
+  geohash: z.string().optional(),
 });
 type LocationProps = z.infer<typeof LocationSchema>;
 
@@ -35,7 +35,7 @@ export class Location {
     return {
       latitude: this.latitude,
       longitude: this.longitude,
-      geohash: this.calcGeohash()
+      geohash: this.calcGeohash(),
     };
   }
 

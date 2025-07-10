@@ -1,8 +1,8 @@
-import { logger } from "firebase-functions";
-import { ProximityVerificationId } from "../../domain/help-request/proximity-verification-id.value";
-import { IProximityVerificationNotifier } from "../../domain/help-request/service/i-proximity-verification.notifier";
-import { FcmGateway } from "./fcm-gateway";
-import { DeviceId } from "../../domain/device/device-id.value";
+import {logger} from "firebase-functions";
+import {ProximityVerificationId} from "../../domain/help-request/proximity-verification-id.value";
+import {IProximityVerificationNotifier} from "../../domain/help-request/service/i-proximity-verification.notifier";
+import {FcmGateway} from "./fcm-gateway";
+import {DeviceId} from "../../domain/device/device-id.value";
 
 
 export class ProximityVerificationNotifier implements IProximityVerificationNotifier {
@@ -22,9 +22,9 @@ export class ProximityVerificationNotifier implements IProximityVerificationNoti
       data: {
         proximityVerificationId: proximityVerificationId.value,
         expiredAt: expiredAt.toISOString(),
-      }
+      },
     };
-    
+
     try {
       await this.gateway.sendNotification(targetDeviceId, data);
     } catch (error) {
