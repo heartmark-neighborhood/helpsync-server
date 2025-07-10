@@ -62,8 +62,10 @@ export const createHelpRequest = https.onCall(
         throw new https.HttpsError("invalid-argument", "The data provided is invalid.");
       }
 
-      logger.error("Internal error:", {uid: request.auth?.uid, error});
-      throw new https.HttpsError("internal", "An internal server error occurred.");
+      logger.error("Internal error:", {uid: request.auth?.uid, error, errorMessage: error instanceof Error ? error.message : "Unknown error"});
+      throw new https.HttpsError("internal", "An internal server error occurred.", {
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   }
 );
