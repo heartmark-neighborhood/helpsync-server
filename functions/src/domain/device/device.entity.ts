@@ -39,4 +39,15 @@ export class Device{
       this.clock
     );
   }
+
+  renewToken(deviceToken: DeviceToken): Device {
+    return new Device(
+      this.id,
+      this.ownerId,
+      deviceToken,
+      this.location,
+      this.clock.now(),
+      this.clock
+    );
+  }
 }
