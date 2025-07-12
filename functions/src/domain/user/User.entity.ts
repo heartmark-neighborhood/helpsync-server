@@ -12,7 +12,9 @@ export class User {
     readonly physicalFeatures: string = "黒いリュックサックを背負っています。",
 
     readonly createdAt: Date,
-    readonly updatedAt: Date
+    readonly updatedAt: Date,
+
+    private readonly clock: IClock,
   ) {}
 
   static create(
@@ -22,9 +24,10 @@ export class User {
     role: "supporter" | "requester" = "requester",
     iconUrl = "path/to/icon.jpg",
     physicalFeatures = "黒いリュックサックを背負っています。",
-    clock: IClock = {now: () => new Date()}
+    createdAt: Date = new Date(),
+    updatedAt: Date = new Date(),
+    clock: IClock,
   ): User {
-    const now = clock.now();
-    return new User(id, nickname, email, role, true, iconUrl, physicalFeatures, now, now);
+    return new User(id, nickname, email, role, true, iconUrl, physicalFeatures, createdAt, updatedAt, clock);
   }
 }
