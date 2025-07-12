@@ -8,8 +8,8 @@ export class DeviceToken {
   ) {}
 
   static create(value: string): DeviceToken {
-    if (!value || typeof value !== 'string') {
-      throw new Error('Invalid device token');
+    if (!value || typeof value !== "string") {
+      throw new Error("Invalid device token");
     }
     return new DeviceToken(value);
   }

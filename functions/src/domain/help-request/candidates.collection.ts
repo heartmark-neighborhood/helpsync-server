@@ -1,9 +1,8 @@
-import { UserId } from "../user/user-id.value";
-import { Candidate, CandidateSchema } from "./candidate.entity";
-import { CandidateStatus } from "./candidate.entity";
+import {UserId} from "../user/user-id.value";
+import {Candidate, CandidateSchema, CandidateStatus} from "./candidate.entity";
 
-import { z } from "zod";
-import { UserInfo } from "./user-info.dto";
+import {z} from "zod";
+import {UserInfo} from "./user-info.dto";
 
 export const CandidatesCollectionSchema = z.array(CandidateSchema);
 export type CandidatesCollectionProps = z.infer<typeof CandidatesCollectionSchema>;
@@ -68,7 +67,7 @@ export class CandidatesCollection {
 
   timeoutProximityVerification(): CandidatesCollection {
     const updatedCandidates = this.candidates.map((candidate) => {
-      if (candidate.statusIs('proximity-verification-requested')) {
+      if (candidate.statusIs("proximity-verification-requested")) {
         candidate.failedProximityVerification();
       }
       return candidate;
@@ -78,7 +77,7 @@ export class CandidatesCollection {
 
   notifiedHelpRequest(): CandidatesCollection {
     const updatedCandidates = this.candidates.map((candidate) => {
-      if (candidate.statusIs('proximity-verification-succeeded')) {
+      if (candidate.statusIs("proximity-verification-succeeded")) {
         candidate.notified();
       }
       return candidate;

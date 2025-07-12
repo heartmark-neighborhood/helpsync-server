@@ -1,7 +1,7 @@
-import { Message } from "firebase-admin/messaging";
+import {Message} from "firebase-admin/messaging";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
-import { DeviceToken } from "../../domain/device/device-token.value";
+import {DeviceToken} from "../../domain/device/device-token.value";
 
 
 export class FcmGateway {
@@ -17,18 +17,17 @@ export class FcmGateway {
   public async sendNotification(
     deviceToken: DeviceToken,
     data: Record<string, any>
-  ): Promise<void>{
-
+  ): Promise<void> {
     const message: Message = {
       token: deviceToken.toString(),
       data: data || {},
     };
 
-    try{
+    try {
       await admin.messaging().send(message);
-      logger.info("Notification sent successfully", { deviceToken: deviceToken, data });
+      logger.info("Notification sent successfully", {deviceToken: deviceToken, data});
     } catch (error) {
-      logger.error("Error sending notification", { deviceToken: deviceToken, error });
+      logger.error("Error sending notification", {deviceToken: deviceToken, error});
       throw new Error("Failed to send notification");
     }
   }

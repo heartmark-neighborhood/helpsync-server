@@ -1,21 +1,21 @@
-import { IDeviceRepository } from "../../domain/device/i-device.repository";
-import { Device } from "../../domain/device/device.entity";
-import { Location } from "../../domain/shared/value-object/Location.value";
+import {IDeviceRepository} from "../../domain/device/i-device.repository";
+import {Device} from "../../domain/device/device.entity";
+import {Location} from "../../domain/shared/value-object/Location.value";
 
-import { geohashQueryBounds, distanceBetween } from 'geofire-common';
-import * as FirebaseFirestore from '@google-cloud/firestore';
+import {geohashQueryBounds, distanceBetween} from "geofire-common";
+import * as FirebaseFirestore from "@google-cloud/firestore";
 import {
   getFirestore,
   Query,
   DocumentData,
   QuerySnapshot,
   GeoPoint,
-} from 'firebase-admin/firestore'; 
-import { DeviceToken } from "../../domain/device/device-token.value";
-import { UserId } from "../../domain/user/user-id.value";
-import { IClock } from "../../domain/shared/service/i-clock.service";
-import { DeviceId } from "../../domain/device/device-id.value";
-import { DevicesCollection } from "../../domain/device/devices.collection";
+} from "firebase-admin/firestore";
+import {DeviceToken} from "../../domain/device/device-token.value";
+import {UserId} from "../../domain/user/user-id.value";
+import {IClock} from "../../domain/shared/service/i-clock.service";
+import {DeviceId} from "../../domain/device/device-id.value";
+import {DevicesCollection} from "../../domain/device/devices.collection";
 export class DeviceRepository implements IDeviceRepository {
   private constructor(
     private readonly db: FirebaseFirestore.Firestore,
@@ -29,37 +29,40 @@ export class DeviceRepository implements IDeviceRepository {
   }
 
   async save(device: Device): Promise<Device> {
-    const docRef = this.db.collection('users')
-                    .doc(device.ownerId.toString())
-                    .collection('devices')
-                    .doc(device.id.toString());
+    const docRef = this.db.collection("devices").doc(device.id.toString());
 
     const deviceData = {
       ownerId: device.ownerId.toString(),
       fcmToken: device.deviceToken.toString(),
-      location: new GeoPoint(device.location.latitude, device.location.longitude),
+      location: new GeoPoint(
+        device.location.latitude,
+        device.location.longitude,
+      ),
       geohash: device.location.calcGeohash(),
       lastUpdatedAt: this.clock.now(),
-    }
+    };
     await docRef.set(deviceData);
     return device;
   }
 
   async findAvailableNearBy(
     center: Location,
-    radiusInM: number
+    radiusInM: number,
   ): Promise<DevicesCollection> {
-    const bounds = geohashQueryBounds([center.latitude, center.longitude], radiusInM);
+    const bounds = geohashQueryBounds(
+      [center.latitude, center.longitude],
+      radiusInM,
+    );
 
     const promises: Promise<QuerySnapshot<DocumentData>>[] = [];
-    
+
     for (const b of bounds) {
       const q: Query<DocumentData> = this.db
-        .collectionGroup('devices') // ★★★ this.db.collectionGroup() でクエリを開始 ★★★
-        .orderBy('geohash')
+        .collection("devices")
+        .orderBy("geohash")
         .startAt(b[0])
         .endAt(b[1]);
-      promises.push(q.get()); // ★★★ メソッド名が getDocs から get に変わる ★★★
+      promises.push(q.get());
     }
 
     const snapshots = await Promise.all(promises);
@@ -67,7 +70,6 @@ export class DeviceRepository implements IDeviceRepository {
     const matchingDocs = new Map<string, DocumentData>();
     for (const snap of snapshots) {
       for (const doc of snap.docs) {
-        // ここでの重複除去は同じ
         matchingDocs.set(doc.id, doc.data());
       }
     }
@@ -75,21 +77,27 @@ export class DeviceRepository implements IDeviceRepository {
     const finalResults = DevicesCollection.create();
     for (const [id, data] of matchingDocs.entries()) {
       const docLocation = data.location as GeoPoint;
-      
-      const distanceInM = distanceBetween(
-        [docLocation.latitude, docLocation.longitude],
-        [center.latitude, center.longitude]
-      ) * 1000;
+
+      const distanceInM =
+        distanceBetween(
+          [docLocation.latitude, docLocation.longitude],
+          [center.latitude, center.longitude],
+        ) * 1000;
 
       if (distanceInM <= radiusInM) {
-        finalResults.add(Device.create(
-          DeviceId.create(id),
-          UserId.create(data.ownerId),
-          DeviceToken.create(data.fcmToken),
-          Location.create({ latitude: docLocation.latitude, longitude: docLocation.longitude }),
-          new Date(data.lastUpdatedAt),
-          this.clock
-        ));
+        finalResults.add(
+          Device.create(
+            DeviceId.create(id),
+            UserId.create(data.ownerId),
+            DeviceToken.create(data.fcmToken),
+            Location.create({
+              latitude: docLocation.latitude,
+              longitude: docLocation.longitude,
+            }),
+            new Date(data.lastUpdatedAt),
+            this.clock,
+          ),
+        );
       }
     }
 
@@ -97,21 +105,28 @@ export class DeviceRepository implements IDeviceRepository {
   }
 
   async findById(deviceId: DeviceId): Promise<Device | null> {
-    const snapshot = await this.db.collectionGroup('devices').where('id', '==', deviceId.value).get();
-    if (snapshot.empty) {
+    const docRef = this.db.collection("devices").doc(deviceId.toString());
+    const snapshot = await docRef.get();
+
+    if (!snapshot.exists) {
       return null;
     }
-    const doc = snapshot.docs[0];
+
+    const data = snapshot.data();
+    if (!data) {
+      return null;
+    }
+
     return Device.create(
-      DeviceId.create(doc.id),
-      UserId.create(doc.data().ownerId),
-      DeviceToken.create(doc.data().fcmToken),
+      DeviceId.create(snapshot.id),
+      UserId.create(data.ownerId),
+      DeviceToken.create(data.fcmToken),
       Location.create({
-        latitude: doc.data().location.latitude,
-        longitude: doc.data().location.longitude,
+        latitude: data.location.latitude,
+        longitude: data.location.longitude,
       }),
-      new Date(doc.data().lastUpdatedAt),
-      this.clock
+      new Date(data.lastUpdatedAt),
+      this.clock,
     );
   }
 }

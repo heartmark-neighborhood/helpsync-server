@@ -1,8 +1,8 @@
-import { IHelpRequestNotifier } from "../../domain/help-request/service/i-help-request.notifier";
-import { FcmGateway } from "./fcm-gateway";
-import { DeviceId } from "../../domain/device/device-id.value";
-import { logger } from "firebase-functions";
-import { UserInfo } from "../../domain/help-request/user-info.dto";
+import {IHelpRequestNotifier} from "../../domain/help-request/service/i-help-request.notifier";
+import {FcmGateway} from "./fcm-gateway";
+import {DeviceId} from "../../domain/device/device-id.value";
+import {logger} from "firebase-functions";
+import {UserInfo} from "../../domain/help-request/user-info.dto";
 
 
 export class HelpRequestNotifier implements IHelpRequestNotifier {
@@ -25,9 +25,9 @@ export class HelpRequestNotifier implements IHelpRequestNotifier {
           nickname: requesterInfo.nickname,
           iconUrl: requesterInfo.iconUrl,
           physicalDescription: requesterInfo.physicalDescription,
-        }
-      }
-    }
+        },
+      },
+    };
 
     try {
       await this.gateway.sendNotification(targetDeviceId, data);
@@ -41,14 +41,14 @@ export class HelpRequestNotifier implements IHelpRequestNotifier {
     const data = {
       type: "help-request",
       data: {
-        candidates: candidatesInfo.map(candidate => ({
+        candidates: candidatesInfo.map((candidate) => ({
           id: candidate.id,
           nickname: candidate.nickname,
           iconUrl: candidate.iconUrl,
           physicalDescription: candidate.physicalDescription,
-        }))
-      }
-    }
+        })),
+      },
+    };
 
     try {
       await this.gateway.sendNotification(targetDeviceId, data);

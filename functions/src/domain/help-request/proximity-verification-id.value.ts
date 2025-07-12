@@ -1,12 +1,12 @@
-import { z } from 'zod';
-import { randomUUID } from 'crypto';
+import {z} from "zod";
+import {randomUUID} from "crypto";
 
 export const ProximityVerificationIdSchema = z.string(
   {
-    invalid_type_error: 'ID must be a string.',
+    invalid_type_error: "ID must be a string.",
   }
 ).uuid({
-  message: 'Invalid ID format. It must be a valid UUID.',
+  message: "Invalid ID format. It must be a valid UUID.",
 });
 
 export class ProximityVerificationId {

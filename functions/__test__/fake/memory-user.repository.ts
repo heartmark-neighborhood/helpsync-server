@@ -1,38 +1,45 @@
-import { IUserRepository } from '../../src/domain/user/i-user.repository';
-import { User } from '../../src/domain/user/User.entity';
-import { UserId } from '../../src/domain/user/user-id.value';
-import { TestClock } from './test-clock.service';
+import {IUserRepository} from "../../src/domain/user/i-user.repository";
+import {User} from "../../src/domain/user/User.entity";
+import {UserId} from "../../src/domain/user/user-id.value";
+import {TestClock} from "./test-clock.service";
 
 export class MemoryUserRepository implements IUserRepository {
   private users: User[] = [];
+  private readonly clock: TestClock = new TestClock();
   private requester = User.create(
-    UserId.create('requester-id'),
-    'hogehoge',
-    'requester@example.com',
-    'requester',
-    'path/to/requester/icon.jpg',
-    '黒いリュックサックを背負っています。',
-    new TestClock()
+    UserId.create("requester-id"),
+    "hogehoge",
+    "requester@example.com",
+    "requester",
+    "path/to/requester/icon.jpg",
+    "黒いリュックサックを背負っています。",
+    this.clock.now(),
+    this.clock.now(),
+    this.clock
   );
 
   private supporter1 = User.create(
-    UserId.create('supporter1-id'),
-    'supporter1',
-    'supporter1@example.com',
-    'supporter',
-    'path/to/supporter1/icon.jpg',
-    '白い帽子をかぶっています。',
-    new TestClock()
+    UserId.create("supporter1-id"),
+    "supporter1",
+    "supporter1@example.com",
+    "supporter",
+    "path/to/supporter1/icon.jpg",
+    "白い帽子をかぶっています。",
+    this.clock.now(),
+    this.clock.now(),
+    this.clock
   );
 
   private supporter2 = User.create(
-    UserId.create('supporter2-id'),
-    'supporter2',
-    'supporter2@example.com',
-    'supporter',
-    'path/to/supporter2/icon.jpg',
-    '黄色いTシャツを着ています。',
-    new TestClock()
+    UserId.create("supporter2-id"),
+    "supporter2",
+    "supporter2@example.com",
+    "supporter",
+    "path/to/supporter2/icon.jpg",
+    "黄色いTシャツを着ています。",
+    this.clock.now(),
+    this.clock.now(),
+    this.clock
   );
 
   constructor() {
@@ -47,7 +54,7 @@ export class MemoryUserRepository implements IUserRepository {
   }
 
   async save(user: User): Promise<User> {
-    const index = this.users.findIndex(u => u.id.equals(user.id));
+    const index = this.users.findIndex((u) => u.id.equals(user.id));
     if (index !== -1) {
       this.users[index] = user;
     } else {
@@ -57,11 +64,11 @@ export class MemoryUserRepository implements IUserRepository {
   }
 
   async findById(id: UserId): Promise<User | null> {
-    const user = this.users.find(u => u.id.equals(id));
+    const user = this.users.find((u) => u.id.equals(id));
     return user || null;
   }
 
   async findManyByIds(ids: UserId[]): Promise<User[]> {
-    return this.users.filter(user => ids.some(id => user.id.equals(id)));
+    return this.users.filter((user) => ids.some((id) => user.id.equals(id)));
   }
 }

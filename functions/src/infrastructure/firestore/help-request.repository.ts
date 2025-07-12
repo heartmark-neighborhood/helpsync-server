@@ -1,20 +1,20 @@
-import * as FirebaseFirestore from '@google-cloud/firestore';
+import * as FirebaseFirestore from "@google-cloud/firestore";
 
-import { HelpRequest, HelpRequestStatusSchema } from '../../domain/help-request/help-request.entity';
-import { HelpRequestWithRequesterInfo, IHelpRequestRepository } from '../../domain/help-request/i-help-request.repository';
-import { HelpRequestId, HelpRequestIdSchema } from '../../domain/help-request/help-request-id.value';
-import { User } from '../../domain/user/User.entity';
-import { IClock } from '../../domain/shared/service/i-clock.service';
-import { UserId, UserIdSchema } from '../../domain/user/user-id.value';
-import { ProximityVerificationId, ProximityVerificationIdSchema } from '../../domain/help-request/proximity-verification-id.value';
-import { CandidatesCollection } from '../../domain/help-request/candidates.collection';
-import { Candidate } from '../../domain/help-request/candidate.entity';
+import {HelpRequest, HelpRequestStatusSchema} from "../../domain/help-request/help-request.entity";
+import {HelpRequestWithRequesterInfo, IHelpRequestRepository} from "../../domain/help-request/i-help-request.repository";
+import {HelpRequestId, HelpRequestIdSchema} from "../../domain/help-request/help-request-id.value";
+import {User} from "../../domain/user/User.entity";
+import {IClock} from "../../domain/shared/service/i-clock.service";
+import {UserId, UserIdSchema} from "../../domain/user/user-id.value";
+import {ProximityVerificationId, ProximityVerificationIdSchema} from "../../domain/help-request/proximity-verification-id.value";
+import {CandidatesCollection} from "../../domain/help-request/candidates.collection";
+import {Candidate} from "../../domain/help-request/candidate.entity";
 
-import { z } from 'zod';
-import { Location, LocationSchema } from '../../domain/shared/value-object/Location.value';
-import { DeviceId } from '../../domain/device/device-id.value';
-import { GeoPoint, Timestamp } from 'firebase-admin/firestore';
-import { UserInfo, UserInfoDTO, UserInfoSchema } from '../../domain/help-request/user-info.dto';
+import {z} from "zod";
+import {Location, LocationSchema} from "../../domain/shared/value-object/Location.value";
+import {DeviceId} from "../../domain/device/device-id.value";
+import {GeoPoint, Timestamp} from "firebase-admin/firestore";
+import {UserInfo, UserInfoDTO, UserInfoSchema} from "../../domain/help-request/user-info.dto";
 
 const HelpRequestDocSchema = z.object({
   id: HelpRequestIdSchema,
@@ -25,7 +25,7 @@ const HelpRequestDocSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   proximityCheckDeadline: z.date(),
-  requesterInfo: UserInfoSchema
+  requesterInfo: UserInfoSchema,
 });
 
 export type HelpRequestDoc = z.infer<typeof HelpRequestDocSchema>;
@@ -44,7 +44,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
   }
 
   async save(helpRequest: HelpRequest): Promise<HelpRequest> {
-    const helpRequestRef = this.db.collection('helpRequests').doc(helpRequest.id.value);
+    const helpRequestRef = this.db.collection("helpRequests").doc(helpRequest.id.value);
     const batch = this.db.batch();
 
     const helpRequestData = helpRequest.toPersistenceModel();
@@ -56,22 +56,22 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       location: new GeoPoint(helpRequestData.location.latitude, helpRequestData.location.longitude),
       createdAt: Timestamp.fromDate(helpRequestData.createdAt),
       updatedAt: Timestamp.fromDate(helpRequestData.updatedAt),
-      proximityCheckDeadline: Timestamp.fromDate(helpRequestData.proximityCheckDeadline)
+      proximityCheckDeadline: Timestamp.fromDate(helpRequestData.proximityCheckDeadline),
     };
-    batch.set(helpRequestRef, helpRequestDocData, { merge: true });
+    batch.set(helpRequestRef, helpRequestDocData, {merge: true});
 
     const candidates = helpRequestData.candidates;
-    if( candidates && candidates.length > 0 ) {
+    if ( candidates && candidates.length > 0 ) {
       candidates.forEach((candidate) => {
-        const candidateRef = helpRequestRef.collection('candidates').doc(candidate.id);
+        const candidateRef = helpRequestRef.collection("candidates").doc(candidate.id);
         const candidateData: UserInfoDTO = {
           id: candidate.id,
           nickname: candidate.nickname,
           iconUrl: candidate.iconUrl,
           physicalDescription: candidate.physicalDescription,
-          deviceId: candidate.deviceId
+          deviceId: candidate.deviceId,
         };
-        batch.set(candidateRef, candidateData, { merge: true });
+        batch.set(candidateRef, candidateData, {merge: true});
       });
     }
     const candidatesCollection = CandidatesCollection.create(
@@ -81,7 +81,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
           nickname: candidate.nickname,
           iconUrl: candidate.iconUrl,
           physicalDescription: candidate.physicalDescription,
-          deviceId: candidate.deviceId
+          deviceId: candidate.deviceId,
         });
         return Candidate.create(
           userInfo,
@@ -108,8 +108,8 @@ export class HelpRequestRepository implements IHelpRequestRepository {
 
 
   async findWithRequesterInfoById(id: HelpRequestId): Promise<HelpRequestWithRequesterInfo | null> {
-    const helpRequestRef = this.db.collection('helpRequests').doc(id.value);
-    const candidateCollectionRef = helpRequestRef.collection('candidates');
+    const helpRequestRef = this.db.collection("helpRequests").doc(id.value);
+    const candidateCollectionRef = helpRequestRef.collection("candidates");
     const doc = await helpRequestRef.get();
 
     if (!doc.exists) return null;
@@ -135,7 +135,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       helpRequestData.status,
       Location.create({
         latitude: helpRequestData.location.latitude,
-        longitude: helpRequestData.location.longitude
+        longitude: helpRequestData.location.longitude,
       }),
       helpRequestData.createdAt,
       helpRequestData.updatedAt,
@@ -144,21 +144,19 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       this.clock
     );
 
-    
+
     const requesterInfoDTO = helpRequestData.requesterInfo;
     const requester = UserInfo.fromPersistenceModel(requesterInfoDTO);
 
     return {
       helpRequest,
-      requester
+      requester,
     };
-
-
   }
 
   async add(requester: User, requestedLocation: Location, requestedDeviceId: DeviceId): Promise<HelpRequest> {
     const batch = this.db.batch();
-    const helpRequestRef = this.db.collection('helpRequests').doc();
+    const helpRequestRef = this.db.collection("helpRequests").doc();
 
     const helpRequestId = HelpRequestId.create(helpRequestRef.id);
     const proximityVerificationId = ProximityVerificationId.create();
@@ -168,9 +166,9 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       "nickname": requester.nickname,
       "iconUrl": requester.iconUrl,
       "deviceId": requestedDeviceId.toString(),
-      "physicalDescription": requester.physicalFeatures || '' // Assuming physicalDescription is optional
-    }
-    const status = 'pending';
+      "physicalDescription": requester.physicalFeatures || "", // Assuming physicalDescription is optional
+    };
+    const status = "pending";
     const location = new GeoPoint(requestedLocation.latitude, requestedLocation.longitude);
     const createdAt = Timestamp.fromDate(this.clock.now());
     const updatedAt = createdAt;
@@ -185,7 +183,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       location,
       createdAt,
       updatedAt,
-      proximityCheckDeadline
+      proximityCheckDeadline,
     };
 
     batch.set(helpRequestRef, helpRequestData);

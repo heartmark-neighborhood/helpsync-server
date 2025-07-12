@@ -7,13 +7,14 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+import * as admin from "firebase-admin";
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+export * from "./infrastructure/functions/create-help-request.function.js";
+export * from "./infrastructure/functions/complete-help-request.function.js";
+export * from "./infrastructure/functions/handle-proximity-verification-result.function.js";
+export * from "./infrastructure/functions/on-proximity-verification-timeout.function.js";
+export * from "./infrastructure/functions/update-device-location.function.js";

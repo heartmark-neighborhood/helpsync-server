@@ -1,19 +1,18 @@
-import { z } from 'zod';
+import {z} from "zod";
 
 
 export const HelpRequestIdSchema = z
   .string({
-    invalid_type_error: 'ID must be a string.',
+    invalid_type_error: "ID must be a string.",
   })
   .regex(/^[A-Za-z0-9]{20}$/, {
-    message: 'Invalid ID format. It must be a 20-character alphanumeric string.',
+    message: "Invalid ID format. It must be a 20-character alphanumeric string.",
   });
 
 export type HelpRequestIdPersistenceModel = z.infer<typeof HelpRequestIdSchema>;
 
 
 export class HelpRequestId {
-
   private constructor(readonly value: string) {}
 
   public static create(value: string = HelpRequestId.generateId()): HelpRequestId {
@@ -22,7 +21,7 @@ export class HelpRequestId {
   }
 
   private static generateId(): string {
-    return 'xxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, () => {
+    return "xxxxxxxxxxxxxxxxxxxx".replace(/[x]/g, () => {
       const random = Math.floor(Math.random() * 16);
       return random.toString(16);
     });
