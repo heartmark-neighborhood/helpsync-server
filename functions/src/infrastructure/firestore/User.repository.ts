@@ -61,8 +61,8 @@ export class UserRepository implements IUserRepository {
     if (ids.length === 0) {
       return [];
     }
-    const queuery = this.db.collection("users").where("id", "in", ids);
-    const snapshot = await queuery.get();
+    const query = this.db.collection("users").where("id", "in", ids.map((id) => id.toString()));
+    const snapshot = await query.get();
     if (snapshot.empty) {
       return [];
     }
