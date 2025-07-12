@@ -24,8 +24,8 @@ export class User {
     role: "supporter" | "requester" = "requester",
     iconUrl = "path/to/icon.jpg",
     physicalFeatures = "黒いリュックサックを背負っています。",
-    createdAt: Date = new Date(),
-    updatedAt: Date = new Date(),
+    createdAt: Date,
+    updatedAt: Date,
     clock: IClock,
   ): User {
     return new User(id, nickname, email, role, true, iconUrl, physicalFeatures, createdAt, updatedAt, clock);
