@@ -1,3 +1,7 @@
+import { z } from 'zod';
+
+export const DeviceTokenSchema = z.string().min(1, 'Device token must not be empty');
+
 export class DeviceToken {
   private constructor(
     public readonly value: string,
