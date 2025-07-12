@@ -5,6 +5,7 @@ import {TestClock} from "./test-clock.service";
 
 export class MemoryUserRepository implements IUserRepository {
   private users: User[] = [];
+  private readonly clock: TestClock = new TestClock();
   private requester = User.create(
     UserId.create("requester-id"),
     "hogehoge",
@@ -12,7 +13,9 @@ export class MemoryUserRepository implements IUserRepository {
     "requester",
     "path/to/requester/icon.jpg",
     "黒いリュックサックを背負っています。",
-    new TestClock()
+    this.clock.now(),
+    this.clock.now(),
+    this.clock
   );
 
   private supporter1 = User.create(
@@ -22,7 +25,9 @@ export class MemoryUserRepository implements IUserRepository {
     "supporter",
     "path/to/supporter1/icon.jpg",
     "白い帽子をかぶっています。",
-    new TestClock()
+    this.clock.now(),
+    this.clock.now(),
+    this.clock
   );
 
   private supporter2 = User.create(
@@ -32,7 +37,9 @@ export class MemoryUserRepository implements IUserRepository {
     "supporter",
     "path/to/supporter2/icon.jpg",
     "黄色いTシャツを着ています。",
-    new TestClock()
+    this.clock.now(),
+    this.clock.now(),
+    this.clock
   );
 
   constructor() {
