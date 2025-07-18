@@ -1,5 +1,5 @@
-import {UserId} from "../user/user-id.value";
-import {Device} from "./device.entity";
+import {UserId} from "../user/user-id.value.js";
+import {Device} from "./device.entity.js";
 
 export class DevicesCollection {
   private devices: Device[] = [];

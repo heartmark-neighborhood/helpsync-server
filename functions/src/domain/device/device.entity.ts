@@ -1,8 +1,8 @@
-import {Location} from "../shared/value-object/Location.value";
-import {DeviceToken} from "./device-token.value";
-import {UserId} from "../user/user-id.value";
-import {IClock} from "../shared/service/i-clock.service";
-import {DeviceId} from "./device-id.value";
+import {Location} from "../shared/value-object/Location.value.js";
+import {DeviceToken} from "./device-token.value.js";
+import {UserId} from "../user/user-id.value.js";
+import {IClock} from "../shared/service/i-clock.service.js";
+import {DeviceId} from "./device-id.value.js";
 
 export class Device {
   private constructor(

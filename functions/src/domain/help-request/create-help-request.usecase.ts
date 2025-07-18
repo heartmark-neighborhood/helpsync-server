@@ -1,19 +1,19 @@
-import {LocationSchema, Location} from "../shared/value-object/Location.value";
-import {IUserRepository} from "../user/i-user.repository";
-import {UserId} from "../user/user-id.value";
-import {HelpRequest} from "./help-request.entity";
-import {IHelpRequestRepository} from "./i-help-request.repository";
-import {IProximityVerificationNotifier} from "./service/i-proximity-verification.notifier";
+import {LocationSchema, Location} from "../shared/value-object/Location.value.js";
+import {IUserRepository} from "../user/i-user.repository.js";
+import {UserId} from "../user/user-id.value.js";
+import {HelpRequest} from "./help-request.entity.js";
+import {IHelpRequestRepository} from "./i-help-request.repository.js";
+import {IProximityVerificationNotifier} from "./service/i-proximity-verification.notifier.js";
 
 import {z} from "zod";
 import {addMinutes} from "date-fns";
-import {IClock} from "../shared/service/i-clock.service";
-import {CandidatesCollection} from "./candidates.collection";
-import {Candidate} from "./candidate.entity";
-import {IProximityVerificationTimeoutScheduler} from "./service/i-proximity-verfication-timeout.scheduler";
-import {IDeviceRepository} from "../device/i-device.repository";
-import {DeviceId, DeviceIdSchema} from "../device/device-id.value";
-import {UserInfo} from "./user-info.dto";
+import {IClock} from "../shared/service/i-clock.service.js";
+import {CandidatesCollection} from "./candidates.collection.js";
+import {Candidate} from "./candidate.entity.js";
+import {IProximityVerificationTimeoutScheduler} from "./service/i-proximity-verfication-timeout.scheduler.js";
+import {IDeviceRepository} from "../device/i-device.repository.js";
+import {DeviceId, DeviceIdSchema} from "../device/device-id.value.js";
+import {UserInfo} from "./user-info.dto.js";
 
 export const CreateHelpRequestInputSchema = z.object({
   location: LocationSchema,

@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {UserInfo, UserInfoSchema} from "./user-info.dto";
+import {UserInfo, UserInfoSchema} from "./user-info.dto.js";
 
 const CandidateStatusSchema = z.enum([
   "pending",

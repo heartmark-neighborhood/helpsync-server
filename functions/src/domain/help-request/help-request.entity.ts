@@ -1,9 +1,9 @@
-import {Location} from "../shared/value-object/Location.value";
-import {UserId} from "../user/user-id.value";
-import {CandidatesCollection} from "./candidates.collection";
-import {HelpRequestId} from "./help-request-id.value";
-import {ProximityVerificationId} from "./proximity-verification-id.value";
-import {IClock} from "../shared/service/i-clock.service";
+import {Location} from "../shared/value-object/Location.value.js";
+import {UserId} from "../user/user-id.value.js";
+import {CandidatesCollection} from "./candidates.collection.js";
+import {HelpRequestId} from "./help-request-id.value.js";
+import {ProximityVerificationId} from "./proximity-verification-id.value.js";
+import {IClock} from "../shared/service/i-clock.service.js";
 
 import {z} from "zod";
 import {addMinutes} from "date-fns";

@@ -1,8 +1,8 @@
-import {DeviceId, DeviceIdSchema} from "../device/device-id.value";
-import {UserId, UserIdSchema} from "../user/user-id.value";
+import {DeviceId, DeviceIdSchema} from "../device/device-id.value.js";
+import {UserId, UserIdSchema} from "../user/user-id.value.js";
 
 import {z} from "zod";
-import {User} from "../user/User.entity";
+import {User} from "../user/User.entity.js";
 
 export const UserInfoSchema = z.object({
   id: UserIdSchema,

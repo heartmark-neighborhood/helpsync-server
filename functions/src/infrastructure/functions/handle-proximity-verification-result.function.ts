@@ -1,8 +1,8 @@
 import {https, logger} from "firebase-functions";
-import {HandleProximityVerificationResultInputSchema, HandleProximityVerificationResultCommand, HandleProximityVerificationResultUseCase} from "../../domain/help-request/handle-proximity-verification-result.usecase";
+import {HandleProximityVerificationResultInputSchema, HandleProximityVerificationResultCommand, HandleProximityVerificationResultUseCase} from "../../domain/help-request/handle-proximity-verification-result.usecase.js";
 import {getFirestore} from "firebase-admin/firestore";
-import {HelpRequestRepository} from "../firestore/help-request.repository";
-import {SystemClock} from "../service/SystemClock";
+import {HelpRequestRepository} from "../firestore/help-request.repository.js";
+import {SystemClock} from "../service/SystemClock.js";
 
 export const handleProximityVerificationResult = https.onCall(async (request) => {
   if (!request.auth) {

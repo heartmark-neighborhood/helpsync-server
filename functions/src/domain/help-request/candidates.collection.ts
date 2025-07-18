@@ -1,5 +1,5 @@
-import {UserId} from "../user/user-id.value";
-import {Candidate, CandidateSchema, CandidateStatus} from "./candidate.entity";
+import {UserId} from "../user/user-id.value.js";
+import {Candidate, CandidateSchema, CandidateStatus} from "./candidate.entity.js";
 
 import {z} from "zod";
 import {UserInfo} from "./user-info.dto";

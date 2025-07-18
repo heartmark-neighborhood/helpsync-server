@@ -1,5 +1,5 @@
-import {DeviceId} from "../../device/device-id.value";
-import {ProximityVerificationId} from "../proximity-verification-id.value";
+import {DeviceId} from "../../device/device-id.value.js";
+import {ProximityVerificationId} from "../proximity-verification-id.value.js";
 
 
 export interface IProximityVerificationNotifier {

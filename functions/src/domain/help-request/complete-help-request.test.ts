@@ -1,5 +1,5 @@
-import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository";
-import {CompleteHelpRequestUsecase} from "./complete-help-request.usecase";
+import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository.js";
+import {CompleteHelpRequestUsecase} from "./complete-help-request.usecase.js";
 
 describe("ヘルプ完了通知", () => {
   it("ヘルプ完了通知を受け取ると、ヘルプ要請の状態が更新される", async () => {

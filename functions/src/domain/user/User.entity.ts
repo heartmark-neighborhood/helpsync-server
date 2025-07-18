@@ -1,5 +1,5 @@
-import {IClock} from "../shared/service/i-clock.service";
-import {UserId} from "./user-id.value";
+import {IClock} from "../shared/service/i-clock.service.js";
+import {UserId} from "./user-id.value.js";
 
 export class User {
   private constructor(

@@ -4,17 +4,17 @@ import {getFirestore} from "firebase-admin/firestore";
 
 import {z} from "zod";
 
-import {CreateHelpRequestInputSchema, CreateHelpRequestCommand, CreateHelpRequestUseCase} from "../../domain/help-request/create-help-request.usecase";
-import {HelpRequestRepository} from "../firestore/help-request.repository";
-import {UserRepository} from "../firestore/User.repository";
-import {FcmGateway} from "../notifications/fcm-gateway";
-import {ProximityVerificationNotifier} from "../notifications/proximity-verification.notifier";
-import {UserId} from "../../domain/user/user-id.value";
-import {Location} from "../../domain/shared/value-object/Location.value";
-import {SystemClock} from "../service/SystemClock";
-import {ProximityVerificationTimeoutScheduler} from "../cloudtasks/proximity-verification-timeout.scheduler";
-import {DeviceRepository} from "../firestore/device.repository";
-import {DeviceId} from "../../domain/device/device-id.value";
+import {CreateHelpRequestInputSchema, CreateHelpRequestCommand, CreateHelpRequestUseCase} from "../../domain/help-request/create-help-request.usecase.js";
+import {HelpRequestRepository} from "../firestore/help-request.repository.js";
+import {UserRepository} from "../firestore/User.repository.js";
+import {FcmGateway} from "../notifications/fcm-gateway.js";
+import {ProximityVerificationNotifier} from "../notifications/proximity-verification.notifier.js";
+import {UserId} from "../../domain/user/user-id.value.js";
+import {Location} from "../../domain/shared/value-object/Location.value.js";
+import {SystemClock} from "../service/SystemClock.js";
+import {ProximityVerificationTimeoutScheduler} from "../cloudtasks/proximity-verification-timeout.scheduler.js";
+import {DeviceRepository} from "../firestore/device.repository.js";
+import {DeviceId} from "../../domain/device/device-id.value.js";
 
 
 export const createHelpRequest = https.onCall(
@@ -29,7 +29,7 @@ export const createHelpRequest = https.onCall(
       const db = getFirestore();
       const clock = SystemClock.create();
       const helpRequestRepository = HelpRequestRepository.create(db, clock);
-      const userRepository = UserRepository.create(db);
+      const userRepository = UserRepository.create(db, clock);
       const deviceRepository = DeviceRepository.create(db, clock);
       const notifier = ProximityVerificationNotifier.create(FcmGateway.create());
       const scheduler = ProximityVerificationTimeoutScheduler.create();

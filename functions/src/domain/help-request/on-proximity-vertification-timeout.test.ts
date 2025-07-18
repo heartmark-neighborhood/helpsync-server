@@ -1,8 +1,8 @@
-import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository";
-import {DeviceId} from "../device/device-id.value";
-import {ProximityVerificationTimeoutCommand, ProximityVerificationTimeoutUseCase} from "./on-proximity-verification-timeout.usecase";
-import {UserInfo} from "./user-info.dto";
-import {IHelpRequestNotifier} from "./service/i-help-request.notifier";
+import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository.js";
+import {DeviceId} from "../device/device-id.value.js";
+import {ProximityVerificationTimeoutCommand, ProximityVerificationTimeoutUseCase} from "./on-proximity-verification-timeout.usecase.js";
+import {UserInfo} from "./user-info.dto.js";
+import {IHelpRequestNotifier} from "./service/i-help-request.notifier.js";
 
 class DummyHelpRequestNotifier implements IHelpRequestNotifier {
   private notifications: { deviceId: string }[] = [];

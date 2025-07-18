@@ -1,7 +1,7 @@
-import { DeviceToken, DeviceTokenSchema } from "./device-token.value";
-import { DeviceId, DeviceIdSchema } from "./device-id.value";
-import { IDeviceRepository } from "./i-device.repository";
-import { z } from "zod";
+import {DeviceToken, DeviceTokenSchema} from "./device-token.value.js";
+import {DeviceId, DeviceIdSchema} from "./device-id.value.js";
+import {IDeviceRepository} from "./i-device.repository.js";
+import {z} from "zod";
 
 export const RenewDeviceTokenSchema = z.object({
   deviceId: DeviceIdSchema,
@@ -31,12 +31,12 @@ export class RenewDeviceTokenUseCase {
   }
 
   async execute(command: RenewDeviceTokenCommand): Promise<void> {
-      const device = await this.repository.findById(command.deviceId);
-      if (!device) {
-        throw new NotFoundError(`Device with ID ${command.deviceId.value} not found`);
-      }
-  
-      const updatedDevice = device.renewToken(command.deviceToken);
-      await this.repository.save(updatedDevice);
+    const device = await this.repository.findById(command.deviceId);
+    if (!device) {
+      throw new Error(`Device with ID ${command.deviceId.value} not found`);
     }
+
+    const updatedDevice = device.renewToken(command.deviceToken);
+    await this.repository.save(updatedDevice);
+  }
 }

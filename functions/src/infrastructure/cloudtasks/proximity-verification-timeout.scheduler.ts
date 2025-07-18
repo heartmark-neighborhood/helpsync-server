@@ -1,10 +1,7 @@
-import {IProximityVerificationTimeoutScheduler} from "../../domain/help-request/service/i-proximity-verfication-timeout.scheduler";
-import {HelpRequestId} from "../../domain/help-request/help-request-id.value";
-
-import {CloudTasksClient} from "@google-cloud/tasks";
+import {IProximityVerificationTimeoutScheduler} from "../../domain/help-request/service/i-proximity-verfication-timeout.scheduler.js";
+import {HelpRequestId} from "../../domain/help-request/help-request-id.value.js";
 
 export class ProximityVerificationTimeoutScheduler implements IProximityVerificationTimeoutScheduler {
-  private readonly client: CloudTasksClient;
   private readonly QUEUE = "proximity-verification-timeout-queue";
   private readonly FUNCTION_URL = "https://<function-name>-<random-hash>-<region>.a.run.app"; // TODO: Replace with actual Cloud Function URL
   private readonly PROJECT_ID = "heartmark-neighborhood";
@@ -13,11 +10,16 @@ export class ProximityVerificationTimeoutScheduler implements IProximityVerifica
 
 
   constructor() {
-    this.client = new CloudTasksClient();
+    // コンストラクタでは何も初期化しない
   }
 
   async schedule(helpRequestId: HelpRequestId, timeoutAt: Date): Promise<void> {
     console.log(`Scheduling timeout for Help Request ID: ${helpRequestId} at ${timeoutAt}`);
+
+    // scheduleメソッド内で動的インポート
+    const {CloudTasksClient} = await import("@google-cloud/tasks");
+    const client = new CloudTasksClient();
+
     const task = {
       httpRequest: {
         httpMethod: "POST" as const,
@@ -30,8 +32,8 @@ export class ProximityVerificationTimeoutScheduler implements IProximityVerifica
     };
 
     try {
-      const parent = this.client.queuePath(this.PROJECT_ID, this.LOCATION, this.QUEUE);
-      const [response] = await this.client.createTask({parent, task});
+      const parent = client.queuePath(this.PROJECT_ID, this.LOCATION, this.QUEUE);
+      const [response] = await client.createTask({parent, task});
       console.log(`Task created: ${response.name}`);
     } catch (error) {
       console.error(`Error scheduling task for Help Request ID ${helpRequestId}:`, error);
