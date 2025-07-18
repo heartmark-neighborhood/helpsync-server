@@ -24,3 +24,4 @@ export * from "./infrastructure/functions/complete-help-request.function.js";
 export * from "./infrastructure/functions/handle-proximity-verification-result.function.js";
 export * from "./infrastructure/functions/on-proximity-verification-timeout.function.js";
 export * from "./infrastructure/functions/update-device-location.function.js";
+export * from "./infrastructure/functions/renew-device-token.function.js";
