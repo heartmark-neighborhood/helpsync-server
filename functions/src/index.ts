@@ -8,10 +8,16 @@
  */
 
 import * as admin from "firebase-admin";
+import {setGlobalOptions} from "firebase-functions/v2";
+
 
 if (!admin.apps.length) {
   admin.initializeApp();
 }
+
+setGlobalOptions({
+  region: "asia-northeast1",
+});
 
 export * from "./infrastructure/functions/create-help-request.function.js";
 export * from "./infrastructure/functions/complete-help-request.function.js";

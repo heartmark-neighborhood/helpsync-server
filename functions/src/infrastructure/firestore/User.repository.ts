@@ -5,10 +5,9 @@ import {IClock} from "../../domain/shared/service/i-clock.service";
 
 import {z} from "zod";
 
-import {DocumentSnapshot, Timestamp} from "firebase-admin/firestore";
+import {DocumentSnapshot, FieldPath, Timestamp} from "firebase-admin/firestore";
 
 export const UserSchema = z.object({
-  id: z.string(),
   nickname: z.string(),
   email: z.string().email(),
   role: z.enum(["supporter", "requester"]),
@@ -35,7 +34,6 @@ export class UserRepository implements IUserRepository {
   async save(user: User): Promise<User> {
     const docRef = this.db.collection("users").doc(user.id.toString());
     await docRef.set({
-      id: user.id.toString(),
       nickname: user.nickname,
       email: user.email,
       role: user.role,
@@ -54,25 +52,25 @@ export class UserRepository implements IUserRepository {
     if (!doc.exists) {
       return null;
     }
-    return this.toEntity(doc);
+    return this.toEntity(doc.id, doc);
   }
 
   async findManyByIds(ids: UserId[]): Promise<User[]> {
     if (ids.length === 0) {
       return [];
     }
-    const query = this.db.collection("users").where("id", "in", ids.map((id) => id.toString()));
+    const query = this.db.collection("users").where(FieldPath.documentId(), "in", ids.map((id) => id.toString()));
     const snapshot = await query.get();
     if (snapshot.empty) {
       return [];
     }
-    return snapshot.docs.map((doc) => this.toEntity(doc));
+    return snapshot.docs.map((doc) => this.toEntity(doc.id, doc));
   }
 
-  private toEntity(data: DocumentSnapshot): User {
+  private toEntity(id: string, data: DocumentSnapshot): User {
     const parsedData = UserSchema.parse(data.data());
     return User.create(
-      UserId.create(parsedData.id),
+      UserId.create(id),
       parsedData.nickname,
       parsedData.email,
       parsedData.role,
