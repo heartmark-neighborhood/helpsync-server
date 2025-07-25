@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "firebase-tools": "^14.11.1"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
