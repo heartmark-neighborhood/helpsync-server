@@ -5,7 +5,6 @@ import {Location} from "../../domain/shared/value-object/Location.value.js";
 import {geohashQueryBounds, distanceBetween} from "geofire-common";
 import * as FirebaseFirestore from "@google-cloud/firestore";
 import {
-  getFirestore,
   Query,
   DocumentData,
   QuerySnapshot,

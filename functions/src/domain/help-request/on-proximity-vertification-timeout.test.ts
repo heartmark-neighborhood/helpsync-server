@@ -6,13 +6,13 @@ import {IHelpRequestNotifier} from "./service/i-help-request.notifier.js";
 
 class DummyHelpRequestNotifier implements IHelpRequestNotifier {
   private notifications: { deviceId: string }[] = [];
-  async notifyRequesterOfMatches(deviceId: DeviceId, requesterInfo: UserInfo): Promise<void> {
+  async notifyRequesterOfMatches(deviceId: DeviceId, _requesterInfo: UserInfo): Promise<void> {
     // Dummy implementation for testing
     this.notifications.push({deviceId: deviceId.value});
     return Promise.resolve();
   }
 
-  async notifySupporterOfMatches(deviceId: DeviceId, candidatesInfo: UserInfo[]): Promise<void> {
+  async notifySupporterOfMatches(deviceId: DeviceId, _candidatesInfo: UserInfo[]): Promise<void> {
     // Dummy implementation for testing
     this.notifications.push({deviceId: deviceId.value});
     return Promise.resolve();

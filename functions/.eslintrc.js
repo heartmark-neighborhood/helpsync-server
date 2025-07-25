@@ -34,5 +34,6 @@ module.exports = {
     "indent": ["error", 2],
     "require-jsdoc": "off",
     "max-len": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", {"argsIgnorePattern": "^_"}],
   },
 };

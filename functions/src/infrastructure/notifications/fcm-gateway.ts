@@ -16,7 +16,7 @@ export class FcmGateway {
   }
   public async sendNotification(
     deviceToken: DeviceToken,
-    data: Record<string, any>
+    data: Record<string, string>
   ): Promise<void> {
     const message: Message = {
       token: deviceToken.toString(),

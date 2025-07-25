@@ -44,7 +44,7 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
     };
   }
 
-  async add(requester: User, location: Location, deviceId: DeviceId): Promise<HelpRequest> {
+  async add(requester: User, location: Location): Promise<HelpRequest> {
     const newHelpRequest = HelpRequest.create(
       HelpRequestId.create(),
       ProximityVerificationId.create(),
