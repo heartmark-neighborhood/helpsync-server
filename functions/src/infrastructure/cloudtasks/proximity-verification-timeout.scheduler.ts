@@ -3,7 +3,7 @@ import {HelpRequestId} from "../../domain/help-request/help-request-id.value.js"
 
 export class ProximityVerificationTimeoutScheduler implements IProximityVerificationTimeoutScheduler {
   private readonly QUEUE = "proximity-verification-timeout-queue";
-  private readonly FUNCTION_URL = "https://<function-name>-<random-hash>-<region>.a.run.app"; // TODO: Replace with actual Cloud Function URL
+  private readonly FUNCTION_URL = "https://asia-northeast1-heartmark-neighborhood.cloudfunctions.net/onProximityVerificationTimeout"; // TODO: Replace with actual Cloud Function URL
   private readonly PROJECT_ID = "heartmark-neighborhood";
   private readonly SERVICE_ACCOUNT_EMAIL = `${this.PROJECT_ID}@appspot.gserviceaccount.com`;
   private readonly LOCATION = "asia-northeast1";
