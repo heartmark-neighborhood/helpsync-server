@@ -1,31 +1,31 @@
-import {CreateHelpRequestCommand, CreateHelpRequestUseCase} from "./create-help-request.usecase";
-import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository";
-import {MemoryUserRepository} from "../../../__test__/fake/memory-user.repository";
-import {UserId} from "../user/user-id.value";
-import {TestClock} from "../../../__test__/fake/test-clock.service";
-import {IProximityVerificationNotifier} from "./service/i-proximity-verification.notifier";
-import {ProximityVerificationId} from "./proximity-verification-id.value";
-import {Location} from "../shared/value-object/Location.value";
-import {IProximityVerificationTimeoutScheduler} from "./service/i-proximity-verfication-timeout.scheduler";
-import {MemoryDeviceRepository} from "../../../__test__/fake/memory-device.repository";
-import {DeviceId} from "../device/device-id.value";
-import {Device} from "../device/device.entity";
-import {HelpRequestId} from "./help-request-id.value";
-import {DevicesCollection} from "../device/devices.collection";
-import {DeviceToken} from "../device/device-token.value";
+import {CreateHelpRequestCommand, CreateHelpRequestUseCase} from "./create-help-request.usecase.js";
+import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository.js";
+import {MemoryUserRepository} from "../../../__test__/fake/memory-user.repository.js";
+import {UserId} from "../user/user-id.value.js";
+import {TestClock} from "../../../__test__/fake/test-clock.service.js";
+import {IProximityVerificationNotifier} from "./service/i-proximity-verification.notifier.js";
+import {ProximityVerificationId} from "./proximity-verification-id.value.js";
+import {Location} from "../shared/value-object/Location.value.js";
+import {IProximityVerificationTimeoutScheduler} from "./service/i-proximity-verfication-timeout.scheduler.js";
+import {MemoryDeviceRepository} from "../../../__test__/fake/memory-device.repository.js";
+import {DeviceId} from "../device/device-id.value.js";
+import {Device} from "../device/device.entity.js";
+import {HelpRequestId} from "./help-request-id.value.js";
+import {DevicesCollection} from "../device/devices.collection.js";
+import {DeviceToken} from "../device/device-token.value.js";
 
 class DummyNotifier implements IProximityVerificationNotifier {
-  async send(targetDeviceId: DeviceId, proximityVerificationId: ProximityVerificationId, expiredAt: Date): Promise<void> {
+  async send(_targetDeviceId: DeviceId, _proximityVerificationId: ProximityVerificationId, _expiredAt: Date): Promise<void> {
     // Dummy implementation
   }
 }
 
 class DummyScheduler implements IProximityVerificationTimeoutScheduler {
-  async schedule(helpRequestId: HelpRequestId, timeoutAt: Date): Promise<void> {
+  async schedule(_helpRequestId: HelpRequestId, _timeoutAt: Date): Promise<void> {
     // Dummy implementation
   }
 
-  async cancel(helpRequestId: HelpRequestId): Promise<void> {
+  async cancel(_helpRequestId: HelpRequestId): Promise<void> {
     // Dummy implementation
   }
 }

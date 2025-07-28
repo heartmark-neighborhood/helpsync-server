@@ -1,9 +1,9 @@
-import {HelpRequest} from "./help-request.entity";
-import {HelpRequestId} from "./help-request-id.value";
-import {User} from "../user/User.entity";
-import {DeviceId} from "../device/device-id.value";
-import {Location} from "../shared/value-object/Location.value";
-import {UserInfo} from "./user-info.dto";
+import {HelpRequest} from "./help-request.entity.js";
+import {HelpRequestId} from "./help-request-id.value.js";
+import {User} from "../user/User.entity.js";
+import {DeviceId} from "../device/device-id.value.js";
+import {Location} from "../shared/value-object/Location.value.js";
+import {UserInfo} from "./user-info.dto.js";
 
 export interface HelpRequestWithRequesterInfo {
   helpRequest: HelpRequest;

@@ -1,6 +1,6 @@
-import {Location, LocationSchema} from "../shared/value-object/Location.value";
-import {DeviceId, DeviceIdSchema} from "./device-id.value";
-import {IDeviceRepository} from "./i-device.repository";
+import {Location, LocationSchema} from "../shared/value-object/Location.value.js";
+import {DeviceId, DeviceIdSchema} from "./device-id.value.js";
+import {IDeviceRepository} from "./i-device.repository.js";
 import {z} from "zod";
 
 export const UpdateDeviceLocationInputSchema = z.object({

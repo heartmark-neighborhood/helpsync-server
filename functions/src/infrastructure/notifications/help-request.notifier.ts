@@ -19,14 +19,14 @@ export class HelpRequestNotifier implements IHelpRequestNotifier {
   async notifyRequesterOfMatches(targetDeviceId: DeviceId, requesterInfo: UserInfo): Promise<void> {
     const data = {
       type: "help-request",
-      data: {
+      data: JSON.stringify({
         requester: {
           id: requesterInfo.id,
           nickname: requesterInfo.nickname,
           iconUrl: requesterInfo.iconUrl,
           physicalDescription: requesterInfo.physicalDescription,
         },
-      },
+      }),
     };
 
     try {
@@ -40,14 +40,14 @@ export class HelpRequestNotifier implements IHelpRequestNotifier {
   async notifySupporterOfMatches(targetDeviceId: DeviceId, candidatesInfo: UserInfo[]): Promise<void> {
     const data = {
       type: "help-request",
-      data: {
+      data: JSON.stringify({
         candidates: candidatesInfo.map((candidate) => ({
           id: candidate.id,
           nickname: candidate.nickname,
           iconUrl: candidate.iconUrl,
           physicalDescription: candidate.physicalDescription,
         })),
-      },
+      }),
     };
 
     try {

@@ -1,12 +1,10 @@
 import {https} from "firebase-functions";
 import * as logger from "firebase-functions/logger";
 import {getFirestore} from "firebase-admin/firestore";
-import {CompleteHelpInputSchema, CompleteHelpRequestUsecase} from "../../domain/help-request/complete-help-request.usecase";
-import {z} from "zod";
-import {HelpRequest} from "../../domain/help-request/help-request.entity";
-import {HelpRequestId} from "../../domain/help-request/help-request-id.value";
-import {HelpRequestRepository} from "../firestore/help-request.repository";
-import {SystemClock} from "../service/SystemClock";
+import {CompleteHelpInputSchema, CompleteHelpRequestUsecase} from "../../domain/help-request/complete-help-request.usecase.js";
+import {HelpRequestId} from "../../domain/help-request/help-request-id.value.js";
+import {HelpRequestRepository} from "../firestore/help-request.repository.js";
+import {SystemClock} from "../service/SystemClock.js";
 
 
 export const completeHelpRequest = https.onCall(

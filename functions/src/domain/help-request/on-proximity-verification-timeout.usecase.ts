@@ -1,8 +1,8 @@
 import {z} from "zod";
 
-import {HelpRequestId, HelpRequestIdSchema} from "./help-request-id.value";
-import {IHelpRequestRepository} from "./i-help-request.repository";
-import {IHelpRequestNotifier} from "./service/i-help-request.notifier";
+import {HelpRequestId, HelpRequestIdSchema} from "./help-request-id.value.js";
+import {IHelpRequestRepository} from "./i-help-request.repository.js";
+import {IHelpRequestNotifier} from "./service/i-help-request.notifier.js";
 
 export const ProximityVerificationTimeoutInputSchema = z.object({
   helpRequestId: HelpRequestIdSchema,

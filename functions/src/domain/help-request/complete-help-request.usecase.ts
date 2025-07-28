@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {HelpRequestId, HelpRequestIdSchema} from "./help-request-id.value";
-import {IHelpRequestRepository} from "./i-help-request.repository";
+import {HelpRequestId, HelpRequestIdSchema} from "./help-request-id.value.js";
+import {IHelpRequestRepository} from "./i-help-request.repository.js";
 
 
 export const CompleteHelpInputSchema = z.object({

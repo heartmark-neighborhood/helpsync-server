@@ -1,11 +1,10 @@
-import {IDeviceRepository} from "../../domain/device/i-device.repository";
-import {Device} from "../../domain/device/device.entity";
-import {Location} from "../../domain/shared/value-object/Location.value";
+import {IDeviceRepository} from "../../domain/device/i-device.repository.js";
+import {Device} from "../../domain/device/device.entity.js";
+import {Location} from "../../domain/shared/value-object/Location.value.js";
 
 import {geohashQueryBounds, distanceBetween} from "geofire-common";
 import * as FirebaseFirestore from "@google-cloud/firestore";
 import {
-  getFirestore,
   Query,
   DocumentData,
   QuerySnapshot,

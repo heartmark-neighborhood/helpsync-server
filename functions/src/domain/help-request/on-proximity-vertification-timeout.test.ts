@@ -1,18 +1,18 @@
-import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository";
-import {DeviceId} from "../device/device-id.value";
-import {ProximityVerificationTimeoutCommand, ProximityVerificationTimeoutUseCase} from "./on-proximity-verification-timeout.usecase";
-import {UserInfo} from "./user-info.dto";
-import {IHelpRequestNotifier} from "./service/i-help-request.notifier";
+import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository.js";
+import {DeviceId} from "../device/device-id.value.js";
+import {ProximityVerificationTimeoutCommand, ProximityVerificationTimeoutUseCase} from "./on-proximity-verification-timeout.usecase.js";
+import {UserInfo} from "./user-info.dto.js";
+import {IHelpRequestNotifier} from "./service/i-help-request.notifier.js";
 
 class DummyHelpRequestNotifier implements IHelpRequestNotifier {
   private notifications: { deviceId: string }[] = [];
-  async notifyRequesterOfMatches(deviceId: DeviceId, requesterInfo: UserInfo): Promise<void> {
+  async notifyRequesterOfMatches(deviceId: DeviceId, _requesterInfo: UserInfo): Promise<void> {
     // Dummy implementation for testing
     this.notifications.push({deviceId: deviceId.value});
     return Promise.resolve();
   }
 
-  async notifySupporterOfMatches(deviceId: DeviceId, candidatesInfo: UserInfo[]): Promise<void> {
+  async notifySupporterOfMatches(deviceId: DeviceId, _candidatesInfo: UserInfo[]): Promise<void> {
     // Dummy implementation for testing
     this.notifications.push({deviceId: deviceId.value});
     return Promise.resolve();

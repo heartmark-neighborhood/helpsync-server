@@ -1,20 +1,20 @@
 import * as FirebaseFirestore from "@google-cloud/firestore";
 
-import {HelpRequest, HelpRequestStatusSchema} from "../../domain/help-request/help-request.entity";
-import {HelpRequestWithRequesterInfo, IHelpRequestRepository} from "../../domain/help-request/i-help-request.repository";
-import {HelpRequestId, HelpRequestIdSchema} from "../../domain/help-request/help-request-id.value";
-import {User} from "../../domain/user/User.entity";
-import {IClock} from "../../domain/shared/service/i-clock.service";
-import {UserId, UserIdSchema} from "../../domain/user/user-id.value";
-import {ProximityVerificationId, ProximityVerificationIdSchema} from "../../domain/help-request/proximity-verification-id.value";
-import {CandidatesCollection} from "../../domain/help-request/candidates.collection";
-import {Candidate} from "../../domain/help-request/candidate.entity";
+import {HelpRequest, HelpRequestStatusSchema} from "../../domain/help-request/help-request.entity.js";
+import {HelpRequestWithRequesterInfo, IHelpRequestRepository} from "../../domain/help-request/i-help-request.repository.js";
+import {HelpRequestId, HelpRequestIdSchema} from "../../domain/help-request/help-request-id.value.js";
+import {User} from "../../domain/user/User.entity.js";
+import {IClock} from "../../domain/shared/service/i-clock.service.js";
+import {UserId, UserIdSchema} from "../../domain/user/user-id.value.js";
+import {ProximityVerificationId, ProximityVerificationIdSchema} from "../../domain/help-request/proximity-verification-id.value.js";
+import {CandidatesCollection} from "../../domain/help-request/candidates.collection.js";
+import {Candidate} from "../../domain/help-request/candidate.entity.js";
 
 import {z} from "zod";
-import {Location, LocationSchema} from "../../domain/shared/value-object/Location.value";
-import {DeviceId} from "../../domain/device/device-id.value";
+import {Location, LocationSchema} from "../../domain/shared/value-object/Location.value.js";
+import {DeviceId} from "../../domain/device/device-id.value.js";
 import {GeoPoint, Timestamp} from "firebase-admin/firestore";
-import {UserInfo, UserInfoDTO, UserInfoSchema} from "../../domain/help-request/user-info.dto";
+import {UserInfo, UserInfoDTO, UserInfoSchema} from "../../domain/help-request/user-info.dto.js";
 
 const HelpRequestDocSchema = z.object({
   id: HelpRequestIdSchema,

@@ -1,7 +1,7 @@
-import {MemoryDeviceRepository} from "../../../__test__/fake/memory-device.repository";
-import {Location} from "../shared/value-object/Location.value";
-import {DeviceId} from "./device-id.value";
-import {UpdateDeviceLocationCommand, UpdateDeviceLocationInputSchema, UpdateDeviceLocationUseCase} from "./update-device-location.usecase";
+import {MemoryDeviceRepository} from "../../../__test__/fake/memory-device.repository.js";
+import {Location} from "../shared/value-object/Location.value.js";
+import {DeviceId} from "./device-id.value.js";
+import {UpdateDeviceLocationCommand, UpdateDeviceLocationInputSchema, UpdateDeviceLocationUseCase} from "./update-device-location.usecase.js";
 
 describe("デバイスの位置情報更新", () => {
   it("正常な位置情報更新", async () => {

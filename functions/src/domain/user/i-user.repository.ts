@@ -1,5 +1,5 @@
-import {User} from "./User.entity";
-import {UserId} from "./user-id.value";
+import {User} from "./User.entity.js";
+import {UserId} from "./user-id.value.js";
 
 export interface IUserRepository {
   findById(id: UserId): Promise<User | null>;

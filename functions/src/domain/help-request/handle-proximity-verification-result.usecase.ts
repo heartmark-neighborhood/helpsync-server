@@ -1,7 +1,7 @@
 import {z} from "zod";
-import {HelpRequestId, HelpRequestIdSchema} from "./help-request-id.value";
-import {UserId, UserIdSchema} from "../user/user-id.value";
-import {IHelpRequestRepository} from "./i-help-request.repository";
+import {HelpRequestId, HelpRequestIdSchema} from "./help-request-id.value.js";
+import {UserId, UserIdSchema} from "../user/user-id.value.js";
+import {IHelpRequestRepository} from "./i-help-request.repository.js";
 
 export const HandleProximityVerificationResultInputSchema = z.object({
   helpRequestId: HelpRequestIdSchema,

@@ -78,7 +78,7 @@ export class MemoryDeviceRepository implements IDeviceRepository {
     return device;
   }
 
-  async findAvailableNearBy(center: Location, radiusInM: number): Promise<DevicesCollection> {
+  async findAvailableNearBy(_center: Location, _radiusInM: number): Promise<DevicesCollection> {
     return DevicesCollection.create([
       this.supporter1Device1,
       this.supporter1Device2,
