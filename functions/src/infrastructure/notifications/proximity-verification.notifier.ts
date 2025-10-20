@@ -3,6 +3,7 @@ import {ProximityVerificationId} from "../../domain/help-request/proximity-verif
 import {IProximityVerificationNotifier} from "../../domain/help-request/service/i-proximity-verification.notifier";
 import {FcmGateway} from "./fcm-gateway";
 import {DeviceId} from "../../domain/device/device-id.value";
+import {HelpRequestId} from "../../domain/help-request/help-request-id.value";
 
 
 export class ProximityVerificationNotifier implements IProximityVerificationNotifier {
@@ -16,11 +17,12 @@ export class ProximityVerificationNotifier implements IProximityVerificationNoti
     this.gateway = gateway;
   }
 
-  async send(targetDeviceId: DeviceId, proximityVerificationId: ProximityVerificationId, expiredAt: Date): Promise<void> {
+  async send(targetDeviceId: DeviceId, helpRequestId: HelpRequestId, proximityVerificationId: ProximityVerificationId, expiredAt: Date): Promise<void> {
     const data = {
       type: "proximity-verification",
       data: JSON.stringify({
         proximityVerificationId: proximityVerificationId.value,
+        helpRequestId: helpRequestId.value,
         expiredAt: expiredAt.toISOString(),
       }),
     };

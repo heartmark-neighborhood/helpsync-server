@@ -101,7 +101,7 @@ export class CreateHelpRequestUseCase {
     const expiredAt = addMinutes(command.clock.now(), 1); // 1 minute expiration
 
     for (const device of deviceToNotify) {
-      this.notifier.send(device.id, proximityVerificationId, expiredAt);
+      this.notifier.send(device.id, addedHelpRequest.id, proximityVerificationId, expiredAt);
     }
 
     await this.scheduler.schedule(
@@ -110,7 +110,7 @@ export class CreateHelpRequestUseCase {
     );
 
     const requestedHelpRequest = addedHelpRequest.requestedProximityVerification();
-    this.helpRequestRepository.save(requestedHelpRequest);
+    await this.helpRequestRepository.save(requestedHelpRequest);
 
     return requestedHelpRequest;
   }
