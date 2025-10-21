@@ -128,4 +128,9 @@ export class DeviceRepository implements IDeviceRepository {
       this.clock,
     );
   }
+
+  async nextIdentity(): Promise<DeviceId> {
+    const docRef = this.db.collection("devices").doc();
+    return DeviceId.create(docRef.id);
+  }
 }

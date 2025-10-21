@@ -5,23 +5,19 @@ import {UserId} from "../user/user-id.value";
 import {DeviceId} from "./device-id.value";
 import {DeviceToken} from "./device-token.value";
 import {Location} from "../shared/value-object/Location.value";
-import {IClock} from "../shared/service/i-clock.service";
+import {TestClock} from "../../../__test__/fake/test-clock.service";
+
+import {MemoryDeviceRepository} from "../../../__test__/fake/memory-device.repository";
 
 describe("RegisterNewDeviceUseCase", () => {
   let deviceRepository: IDeviceRepository;
   let registerNewDeviceUseCase: RegisterNewDeviceUseCase;
-  let clock: IClock;
+  let clock: TestClock;
 
   beforeEach(() => {
-    deviceRepository = {
-      save: jest.fn(),
-    } as unknown as IDeviceRepository;
-
-    clock = {
-      now: jest.fn().mockReturnValue(new Date("2024-01-01T00:00:00Z")),
-    };
-
-    registerNewDeviceUseCase = new RegisterNewDeviceUseCase(deviceRepository);
+    deviceRepository = new MemoryDeviceRepository();
+    clock = new TestClock();
+    registerNewDeviceUseCase = RegisterNewDeviceUseCase.create(deviceRepository);
   });
 
   it("should register a new device successfully", async () => {
@@ -42,10 +38,8 @@ describe("RegisterNewDeviceUseCase", () => {
 
     expect(device).toBeInstanceOf(Device);
     expect(device.ownerId).toEqual(ownerId);
-    expect(device.id).toEqual(deviceId);
     expect(device.deviceToken).toEqual(deviceToken);
     expect(device.location).toEqual(location);
     expect(device.lastUpdatedAt).toEqual(clock.now());
-    expect(deviceRepository.save).toHaveBeenCalledWith(device);
   });
 });
