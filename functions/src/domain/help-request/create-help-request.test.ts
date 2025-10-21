@@ -15,7 +15,7 @@ import {DevicesCollection} from "../device/devices.collection.js";
 import {DeviceToken} from "../device/device-token.value.js";
 
 class DummyNotifier implements IProximityVerificationNotifier {
-  async send(_targetDeviceId: DeviceId, _proximityVerificationId: ProximityVerificationId, _expiredAt: Date): Promise<void> {
+  async send(_targetDeviceId: DeviceId, helpRequestId: HelpRequestId, _proximityVerificationId: ProximityVerificationId, _expiredAt: Date): Promise<void> {
     // Dummy implementation
   }
 }

@@ -1,0 +1,146 @@
+{
+  "collections": {
+    "users": {
+      "description": "Manages user profile information.",
+      "documentId": "UserId (Unique user ID)",
+      "fields": {
+        "nickname": {
+          "type": "string",
+          "description": "User's nickname"
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address"
+        },
+        "role": {
+          "type": "string",
+          "description": "User's role ('supporter' or 'requester')"
+        },
+        "isAvailableForHelp": {
+          "type": "boolean",
+          "description": "Whether the user is available to provide help"
+        },
+        "iconUrl": {
+          "type": "string",
+          "description": "URL of the user's profile picture"
+        },
+        "physicalFeatures": {
+          "type": "string",
+          "description": "User's physical features"
+        },
+        "createdAt": {
+          "type": "Timestamp",
+          "description": "Timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "Timestamp",
+          "description": "Timestamp of last update"
+        }
+      }
+    },
+    "devices": {
+      "description": "Manages user device information, particularly location and notification tokens.",
+      "documentId": "DeviceId (Unique device ID)",
+      "fields": {
+        "ownerId": {
+          "type": "string",
+          "description": "ID of the user who owns this device (reference to the 'users' collection)"
+        },
+        "fcmToken": {
+          "type": "string",
+          "description": "Device token for Firebase Cloud Messaging (FCM)"
+        },
+        "location": {
+          "type": "GeoPoint",
+          "description": "Current latitude and longitude of the device"
+        },
+        "geohash": {
+          "type": "string",
+          "description": "Geohash value to speed up location-based searches"
+        },
+        "lastUpdatedAt": {
+          "type": "Timestamp",
+          "description": "Timestamp of the last update"
+        }
+      }
+    },
+    "helpRequests": {
+      "description": "Manages the entire lifecycle of a help request.",
+      "documentId": "HelpRequestId (Unique help request ID)",
+      "fields": {
+        "requesterId": {
+          "type": "string",
+          "description": "ID of the user who requested help (reference to the 'users' collection)"
+        },
+        "requesterInfo": {
+          "type": "object",
+          "description": "A snapshot of the requester's information (denormalized data)",
+          "properties": {
+            "id": {"type": "string"},
+            "nickname": {"type": "string"},
+            "iconUrl": {"type": "string"},
+            "deviceId": {"type": "string"},
+            "physicalDescription": {"type": "string"}
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the request (e.g., 'pending', 'completed')"
+        },
+        "location": {
+          "type": "GeoPoint",
+          "description": "The location where help was requested"
+        },
+        "proximityVerificationId": {
+          "type": "string",
+          "description": "A unique ID for proximity verification"
+        },
+        "proximityCheckDeadline": {
+          "type": "Timestamp",
+          "description": "The expiration time for the proximity check"
+        },
+        "createdAt": {
+          "type": "Timestamp",
+          "description": "Timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "Timestamp",
+          "description": "Timestamp of last update"
+        }
+      },
+      "subcollections": {
+        "candidates": {
+          "description": "Manages information about potential supporters (candidates) for each help request.",
+          "documentId": "The UserId of the candidate",
+          "path": "/helpRequests/{helpRequestId}/candidates/{userId}",
+          "fields": {
+            "id": {
+              "type": "string",
+              "description": "The candidate's UserId"
+            },
+            "nickname": {
+              "type": "string",
+              "description": "The candidate's nickname"
+            },
+            "iconUrl": {
+              "type": "string",
+              "description": "The candidate's icon URL"
+            },
+            "physicalDescription": {
+              "type": "string",
+              "description": "The candidate's physical features"
+            },
+            "deviceId": {
+              "type": "string",
+              "description": "The candidate's DeviceId"
+            },
+            "status": {
+              "type": "string",
+              "description": "The status of the candidate (e.g., 'notified', 'accepted')"
+            }
+          }
+        }
+      }
+    }
+  }
+}
