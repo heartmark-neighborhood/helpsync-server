@@ -34,6 +34,5 @@ export class DeleteDeviceUseCase {
     }
 
     await this.repository.delete(command.deviceId);
-
   }
 }

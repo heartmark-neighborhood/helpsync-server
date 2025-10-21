@@ -5,7 +5,6 @@ import {z} from "zod";
 import {RegisterNewDeviceSchema, RegisterNewDeviceCommand, RegisterNewDeviceUseCase} from "../../domain/device/register-new-device.usecase.js";
 import {DeviceRepository} from "../firestore/device.repository.js";
 import {UserId} from "../../domain/user/user-id.value.js";
-import {DeviceId} from "../../domain/device/device-id.value.js";
 import {SystemClock} from "../service/SystemClock.js";
 import {DeviceToken} from "../../domain/device/device-token.value.js";
 import {Location} from "../../domain/shared/value-object/Location.value.js";

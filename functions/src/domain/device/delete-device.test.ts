@@ -1,5 +1,5 @@
 import {MemoryDeviceRepository} from "../../../__test__/fake/memory-device.repository";
-import {DeleteDeviceUseCase, DeleteDeviceInputSchema, DeleteDeviceCommand} from "./delete-device.usecase";
+import {DeleteDeviceUseCase, DeleteDeviceCommand} from "./delete-device.usecase";
 import {DeviceId} from "./device-id.value";
 import {DeviceToken} from "./device-token.value";
 import {UserId} from "../user/user-id.value";
