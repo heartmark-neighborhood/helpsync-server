@@ -91,9 +91,4 @@ export class MemoryDeviceRepository implements IDeviceRepository {
     const device = this.devices.find((d) => d.id.equals(deviceId));
     return device || null;
   }
-
-  async nextIdentity(): Promise<DeviceId> {
-    const newId = `device-${this.devices.length + 1}`;
-    return DeviceId.create(newId);
-  }
 }

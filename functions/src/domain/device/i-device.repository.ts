@@ -10,5 +10,4 @@ export interface IDeviceRepository {
     radiusInM: number
   ): Promise<DevicesCollection>;
   findById(deviceId: DeviceId): Promise<Device | null>;
-  nextIdentity(): Promise<DeviceId>;
 }
