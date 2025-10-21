@@ -133,4 +133,9 @@ export class DeviceRepository implements IDeviceRepository {
     const docRef = this.db.collection("devices").doc();
     return DeviceId.create(docRef.id);
   }
+
+  async delete(deviceId: DeviceId): Promise<void> {
+    const docRef = this.db.collection("devices").doc(deviceId.toString());
+    await docRef.delete();
+  }
 }
