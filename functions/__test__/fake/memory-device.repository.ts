@@ -96,4 +96,8 @@ export class MemoryDeviceRepository implements IDeviceRepository {
     const newId = `device-${this.devices.length + 1}`;
     return DeviceId.create(newId);
   }
+
+  async delete(deviceId: DeviceId): Promise<void> {
+    this.devices = this.devices.filter((d) => !d.id.equals(deviceId));
+  }
 }

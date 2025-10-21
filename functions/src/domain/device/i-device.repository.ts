@@ -11,4 +11,5 @@ export interface IDeviceRepository {
   ): Promise<DevicesCollection>;
   findById(deviceId: DeviceId): Promise<Device | null>;
   nextIdentity(): Promise<DeviceId>;
+  delete(deviceId: DeviceId): Promise<void>;
 }
