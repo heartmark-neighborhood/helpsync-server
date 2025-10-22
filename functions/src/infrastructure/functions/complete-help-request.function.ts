@@ -1,5 +1,4 @@
-import {https} from "firebase-functions";
-import * as logger from "firebase-functions/logger";
+import {https, logger} from "firebase-functions";
 import {getFirestore} from "firebase-admin/firestore";
 import {CompleteHelpInputSchema, CompleteHelpRequestUsecase} from "../../domain/help-request/complete-help-request.usecase.js";
 import {HelpRequestId} from "../../domain/help-request/help-request-id.value.js";
