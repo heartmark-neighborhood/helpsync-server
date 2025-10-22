@@ -187,6 +187,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     };
 
     batch.set(helpRequestRef, helpRequestData);
+    await batch.commit();
 
     return HelpRequest.create(
       helpRequestId,
