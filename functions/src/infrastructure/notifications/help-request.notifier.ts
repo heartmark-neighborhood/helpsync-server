@@ -1,8 +1,8 @@
 import {IHelpRequestNotifier} from "../../domain/help-request/service/i-help-request.notifier";
 import {FcmGateway} from "./fcm-gateway";
-import {DeviceId} from "../../domain/device/device-id.value";
 import {logger} from "firebase-functions";
 import {UserInfo} from "../../domain/help-request/user-info.dto";
+import {DeviceToken} from "../../domain/device/device-token.value";
 
 
 export class HelpRequestNotifier implements IHelpRequestNotifier {
@@ -16,7 +16,7 @@ export class HelpRequestNotifier implements IHelpRequestNotifier {
     this.gateway = gateway;
   }
 
-  async notifyRequesterOfMatches(targetDeviceId: DeviceId, requesterInfo: UserInfo): Promise<void> {
+  async notifyRequesterOfMatches(targetDeviceToken: DeviceToken, requesterInfo: UserInfo): Promise<void> {
     const data = {
       type: "help-request",
       data: JSON.stringify({
@@ -30,14 +30,14 @@ export class HelpRequestNotifier implements IHelpRequestNotifier {
     };
 
     try {
-      await this.gateway.sendNotification(targetDeviceId, data);
+      await this.gateway.sendNotification(targetDeviceToken, data);
     } catch (error) {
       logger.error("Failed to send help request notification:", error);
       throw new Error("Notification sending failed");
     }
   }
 
-  async notifySupporterOfMatches(targetDeviceId: DeviceId, candidatesInfo: UserInfo[]): Promise<void> {
+  async notifySupporterOfMatches(targetDeviceToken: DeviceToken, candidatesInfo: UserInfo[]): Promise<void> {
     const data = {
       type: "help-request",
       data: JSON.stringify({
@@ -51,7 +51,7 @@ export class HelpRequestNotifier implements IHelpRequestNotifier {
     };
 
     try {
-      await this.gateway.sendNotification(targetDeviceId, data);
+      await this.gateway.sendNotification(targetDeviceToken, data);
     } catch (error) {
       logger.error("Failed to send help request notification:", error);
       throw new Error("Notification sending failed");
