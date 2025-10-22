@@ -1,4 +1,4 @@
-import * as FirebaseFirestore from "@google-cloud/firestore";
+import {Firestore, GeoPoint, Timestamp} from "firebase-admin/firestore";
 
 import {HelpRequest, HelpRequestStatusSchema} from "../../domain/help-request/help-request.entity.js";
 import {HelpRequestWithRequesterInfo, IHelpRequestRepository} from "../../domain/help-request/i-help-request.repository.js";
@@ -13,7 +13,6 @@ import {Candidate} from "../../domain/help-request/candidate.entity.js";
 import {z} from "zod";
 import {Location, LocationSchema} from "../../domain/shared/value-object/Location.value.js";
 import {DeviceId} from "../../domain/device/device-id.value.js";
-import {GeoPoint, Timestamp} from "firebase-admin/firestore";
 import {UserInfo, UserInfoDTO, UserInfoSchema} from "../../domain/help-request/user-info.dto.js";
 
 const HelpRequestDocSchema = z.object({
@@ -31,7 +30,7 @@ const HelpRequestDocSchema = z.object({
 export type HelpRequestDoc = z.infer<typeof HelpRequestDocSchema>;
 
 export class HelpRequestRepository implements IHelpRequestRepository {
-  private db: FirebaseFirestore.Firestore;
+  private db: Firestore;
   private clock: IClock;
 
   static create(db: FirebaseFirestore.Firestore, clock: IClock): HelpRequestRepository {

@@ -3,8 +3,8 @@ import {Device} from "../../domain/device/device.entity.js";
 import {Location} from "../../domain/shared/value-object/Location.value.js";
 
 import {geohashQueryBounds, distanceBetween} from "geofire-common";
-import * as FirebaseFirestore from "@google-cloud/firestore";
 import {
+  Firestore,
   Query,
   DocumentData,
   QuerySnapshot,
@@ -17,11 +17,11 @@ import {DeviceId} from "../../domain/device/device-id.value";
 import {DevicesCollection} from "../../domain/device/devices.collection";
 export class DeviceRepository implements IDeviceRepository {
   private constructor(
-    private readonly db: FirebaseFirestore.Firestore,
+    private readonly db: Firestore,
     private readonly clock: IClock
   ) {}
   static create(
-    db: FirebaseFirestore.Firestore,
+    db: Firestore,
     clock: IClock
   ): DeviceRepository {
     return new DeviceRepository(db, clock);

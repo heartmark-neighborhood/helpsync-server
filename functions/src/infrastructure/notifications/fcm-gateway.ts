@@ -1,6 +1,6 @@
 import {Message} from "firebase-admin/messaging";
 import * as admin from "firebase-admin";
-import * as logger from "firebase-functions/logger";
+import {logger} from "firebase-functions";
 import {DeviceToken} from "../../domain/device/device-token.value";
 
 
@@ -28,7 +28,7 @@ export class FcmGateway {
       logger.info("Notification sent successfully", {deviceToken: deviceToken, data});
     } catch (error) {
       logger.error("Error sending notification", {deviceToken: deviceToken, error});
-      throw new Error("Failed to send notification");
+      throw new Error(`Failed to send notification: ${error}`);
     }
   }
 }
