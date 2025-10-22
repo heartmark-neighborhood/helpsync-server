@@ -33,11 +33,11 @@ export class HelpRequestRepository implements IHelpRequestRepository {
   private db: Firestore;
   private clock: IClock;
 
-  static create(db: FirebaseFirestore.Firestore, clock: IClock): HelpRequestRepository {
+  static create(db: Firestore, clock: IClock): HelpRequestRepository {
     return new HelpRequestRepository(db, clock);
   }
 
-  private constructor(db: FirebaseFirestore.Firestore, clock: IClock) {
+  private constructor(db: Firestore, clock: IClock) {
     this.db = db;
     this.clock = clock;
   }
