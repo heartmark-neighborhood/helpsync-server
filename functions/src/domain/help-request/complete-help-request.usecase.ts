@@ -5,7 +5,7 @@ import {IHelpRequestRepository} from "./i-help-request.repository.js";
 
 export const CompleteHelpInputSchema = z.object({
   helpRequestId: HelpRequestIdSchema,
-}).strict();
+});
 
 export type CompleteHelpInput = z.infer<typeof CompleteHelpInputSchema>;
 
