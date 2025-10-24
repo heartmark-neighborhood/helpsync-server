@@ -18,7 +18,7 @@
 | `createHelpRequest`                   | Callable   | 必要 | **ヘルプ要請の作成**: ユーザーが助けを求めると、その位置情報に基づき、近くにいる他のユーザーに助けを求める通知を送信します。 |
 | `handleProximityVerificationResult`   | Callable   | 必要 | **近接確認への応答**: ヘルプ要請の通知を受け取ったユーザーが「助ける」または「今は無理」と応答した結果を処理します。         |
 | `onProximityVerificationTimeout`      | HTTPS      | -    | **タイムアウト処理**: ヘルプ要請後、一定時間応答がなかった場合に、要請者にその旨を通知するための内部的な処理です。（Cloud Tasksから呼び出されます） |
-| `completeHelpRequest`                 | Callable   | 必要 | **ヘルプ要請の完了**: 助け合いが完了したことをシステムに通知し、要請をクローズします。                                     |
+| `completeHelpRequest`                 | Callable   | 必要 | **ヘルプ要請の完了**: 助け合いが完了したことをシステムに通知し、要請をクローズします。オプションで評価（`evaluation`）を送信できますが、現在は利用されていません（将来拡張用）。 |
 | `updateDeviceLocation`                | Callable   | 必要 | **位置情報の更新**: ユーザーのデバイスの現在地を定期的に更新します。                                                     |
 | `renewDeviceToken`                    | Callable   | 必要 | **デバイストークンの更新**: プッシュ通知に必要なFCMトークンを更新します。                                                 |
 | `registerNewDevice`                 | Callable   | 必要 | **新規デバイスの登録**: 新しいデバイスをユーザーに紐付けてシステムに登録します。                                         |
