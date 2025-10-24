@@ -1,11 +1,13 @@
 import {z} from "zod";
 import {HelpRequestId, HelpRequestIdSchema} from "./help-request-id.value.js";
 import {IHelpRequestRepository} from "./i-help-request.repository.js";
+import {EvaluationSchema} from "./evaluation.value.js";
 
 
 export const CompleteHelpInputSchema = z.object({
   helpRequestId: HelpRequestIdSchema,
-});
+  evaluation: EvaluationSchema.optional(),
+}).strict();
 
 export type CompleteHelpInput = z.infer<typeof CompleteHelpInputSchema>;
 
