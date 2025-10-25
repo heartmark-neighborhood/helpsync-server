@@ -55,6 +55,7 @@ export const createHelpRequest = https.onCall(
 
       const helpRequest = await usecase.execute(command);
       logger.info("Help request created successfully", {uid: request.auth.uid, helpRequestId: helpRequest.id});
+      return {helpRequestId: helpRequest.id};
     } catch (error) {
       if (error instanceof z.ZodError) {
         logger.warn("Validation error:", {uid: request.auth?.uid, errors: error.errors});
