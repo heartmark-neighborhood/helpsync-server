@@ -16,7 +16,7 @@ if (!admin.apps.length) {
 }
 
 setGlobalOptions({
-  region: "asia-northeast1",
+  region: "asia-northeast2",
 });
 
 export * from "./infrastructure/functions/create-help-request.function.js";
