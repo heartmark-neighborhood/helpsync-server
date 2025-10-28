@@ -73,6 +73,27 @@ export class DeviceRepository implements IDeviceRepository {
       }
     }
 
+    // Collect unique ownerIds from device docs
+    const ownerIdSet = new Set<string>();
+    for (const [, data] of matchingDocs.entries()) {
+      if (data && data.ownerId) ownerIdSet.add(data.ownerId);
+    }
+
+    // Fetch user docs for those ownerIds to determine role
+    const ownerIds = Array.from(ownerIdSet);
+    const ownerRoleMap = new Map<string, string | undefined>();
+    if (ownerIds.length > 0) {
+      const userDocPromises = ownerIds.map((ownerId) =>
+        this.db.collection("users").doc(ownerId).get()
+      );
+      const userDocs = await Promise.all(userDocPromises);
+      userDocs.forEach((snap) => {
+        const id = snap.id;
+        const data = snap.data();
+        ownerRoleMap.set(id, data?.role);
+      });
+    }
+
     const finalResults = DevicesCollection.create();
     for (const [id, data] of matchingDocs.entries()) {
       const docLocation = data.location as GeoPoint;
@@ -84,6 +105,13 @@ export class DeviceRepository implements IDeviceRepository {
         ) * 1000;
 
       if (distanceInM <= radiusInM) {
+        const ownerId = data.ownerId;
+        const ownerRole = ownerRoleMap.get(ownerId);
+        // Only include devices whose owner role is "supporter"
+        if (ownerRole !== "supporter") {
+          continue;
+        }
+
         finalResults.add(
           Device.create(
             DeviceId.create(id),
