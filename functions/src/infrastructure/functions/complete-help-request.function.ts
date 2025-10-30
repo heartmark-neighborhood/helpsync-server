@@ -16,7 +16,7 @@ export const completeHelpRequest = https.onCall(
 
     const input = CompleteHelpInputSchema.parse(request.data);
     const helpid: HelpRequestId = HelpRequestId.create(input.helpRequestId);
-    const db = getFirestore();
+    const db = getFirestore("helpsync-db");
     const clock = SystemClock.create();
     const repository = HelpRequestRepository.create(db, clock);
 

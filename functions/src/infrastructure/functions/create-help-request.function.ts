@@ -25,7 +25,8 @@ export const createHelpRequest = https.onCall(
     }
 
     try {
-      const db = getFirestore();
+      logger.info("Attempting to create help request with data:", request.data);
+      const db = getFirestore("helpsync-db");
       const clock = SystemClock.create();
       const helpRequestRepository = HelpRequestRepository.create(db, clock);
       const userRepository = UserRepository.create(db, clock);
@@ -41,7 +42,9 @@ export const createHelpRequest = https.onCall(
         scheduler,
       );
 
+      logger.info("Parsing input data.");
       const input = CreateHelpRequestInputSchema.parse(request.data);
+      logger.info("Input data parsed successfully:", input);
       const requesterId = UserId.create(request.auth.uid);
       const location = Location.create(input.location);
       const deviceId = DeviceId.create(input.deviceId);
@@ -53,16 +56,17 @@ export const createHelpRequest = https.onCall(
         clock
       );
 
+      logger.info("Executing CreateHelpRequestUseCase with command:", {requesterId: requesterId.value, location: location, deviceId: deviceId.value});
       const helpRequest = await usecase.execute(command);
       logger.info("Help request created successfully", {uid: request.auth.uid, helpRequestId: helpRequest.id});
       return {helpRequestId: helpRequest.id};
     } catch (error) {
       if (error instanceof z.ZodError) {
-        logger.warn("Validation error:", {uid: request.auth?.uid, errors: error.errors});
-        throw new https.HttpsError("invalid-argument", "The data provided is invalid.");
+        logger.warn("Validation error:", {uid: request.auth?.uid, errors: error.errors, data: request.data});
+        throw new https.HttpsError("invalid-argument", "The data provided is invalid.", error.errors);
       }
 
-      logger.error("Internal error:", {uid: request.auth?.uid, error, errorMessage: error instanceof Error ? error.message : "Unknown error"});
+      logger.error("Internal error:", {uid: request.auth?.uid, error: error, errorMessage: error instanceof Error ? error.message : "Unknown error", errorStack: error instanceof Error ? error.stack : "No stack available"});
       throw new https.HttpsError("internal", "An internal server error occurred.", {
         details: error instanceof Error ? error.message : "Unknown error",
       });

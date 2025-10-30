@@ -100,4 +100,8 @@ export class CandidatesCollection {
   public get all(): readonly Candidate[] {
     return this.candidates;
   }
+
+  public get length(): number {
+    return this.candidates.length;
+  }
 }

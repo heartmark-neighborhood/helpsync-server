@@ -11,7 +11,6 @@ export const UserSchema = z.object({
   nickname: z.string(),
   email: z.string().email(),
   role: z.enum(["supporter", "requester"]),
-  isAvailableForHelp: z.boolean(),
   iconUrl: z.string().url(),
   physicalFeatures: z.string(),
   createdAt: z.instanceof(Timestamp),

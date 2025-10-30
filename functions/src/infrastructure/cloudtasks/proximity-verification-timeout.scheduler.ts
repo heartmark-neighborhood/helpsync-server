@@ -3,10 +3,10 @@ import {HelpRequestId} from "../../domain/help-request/help-request-id.value.js"
 
 export class ProximityVerificationTimeoutScheduler implements IProximityVerificationTimeoutScheduler {
   private readonly QUEUE = "proximity-verification-timeout-queue";
-  private readonly FUNCTION_URL = "https://asia-northeast1-heartmark-neighborhood.cloudfunctions.net/onProximityVerificationTimeout"; // TODO: Replace with actual Cloud Function URL
+  private readonly FUNCTION_URL = "https://asia-northeast2-heartmark-neighborhood.cloudfunctions.net/onProximityVerificationTimeout"; // TODO: Replace with actual Cloud Function URL
   private readonly PROJECT_ID = "heartmark-neighborhood";
   private readonly SERVICE_ACCOUNT_EMAIL = `${this.PROJECT_ID}@appspot.gserviceaccount.com`;
-  private readonly LOCATION = "asia-northeast1";
+  private readonly LOCATION = "asia-northeast2";
 
 
   constructor() {
@@ -20,13 +20,21 @@ export class ProximityVerificationTimeoutScheduler implements IProximityVerifica
     const {CloudTasksClient} = await import("@google-cloud/tasks");
     const client = new CloudTasksClient();
 
+    const body = Buffer.from(
+      JSON.stringify(
+        {
+          helpRequestId: helpRequestId.toString(),
+        }
+      )
+    ).toString("base64");
+
     const task = {
       httpRequest: {
         httpMethod: "POST" as const,
         url: this.FUNCTION_URL,
         headers: {"Content-Type": "application/json"},
-        oidcToken: {serviceAccountEmail: this.SERVICE_ACCOUNT_EMAIL},
-        body: JSON.stringify({helpRequestId: helpRequestId.toString()}),
+        oidcToken: {serviceAccountEmail: this.SERVICE_ACCOUNT_EMAIL, audience: this.FUNCTION_URL},
+        body,
       },
       scheduleTime: {seconds: timeoutAt.getTime() / 1000},
     };

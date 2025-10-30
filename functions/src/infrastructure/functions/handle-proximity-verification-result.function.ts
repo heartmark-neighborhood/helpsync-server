@@ -17,7 +17,7 @@ export const handleProximityVerificationResult = https.onCall(async (request) =>
   console.log("Proximity verification result received:", request.data);
   logger.info("Proximity verification result received", {data: request.data});
   try {
-    const db = getFirestore();
+    const db = getFirestore("helpsync-db");
     const clock = SystemClock.create();
     const repository = HelpRequestRepository.create(db, clock);
 

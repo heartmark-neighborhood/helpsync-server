@@ -15,6 +15,8 @@ import {UserId} from "../../domain/user/user-id.value";
 import {IClock} from "../../domain/shared/service/i-clock.service";
 import {DeviceId} from "../../domain/device/device-id.value";
 import {DevicesCollection} from "../../domain/device/devices.collection";
+import {logger} from "firebase-functions";
+
 export class DeviceRepository implements IDeviceRepository {
   private constructor(
     private readonly db: Firestore,
@@ -28,6 +30,7 @@ export class DeviceRepository implements IDeviceRepository {
   }
 
   async save(device: Device): Promise<Device> {
+    logger.info("DeviceRepository.save called with device:", device);
     const docRef = this.db.collection("devices").doc(device.id.toString());
 
     const deviceData = {
@@ -41,6 +44,7 @@ export class DeviceRepository implements IDeviceRepository {
       lastUpdatedAt: this.clock.now(),
     };
     await docRef.set(deviceData);
+    logger.info("DeviceRepository.save completed for device:", device.id.toString());
     return device;
   }
 
@@ -48,6 +52,7 @@ export class DeviceRepository implements IDeviceRepository {
     center: Location,
     radiusInM: number,
   ): Promise<DevicesCollection> {
+    logger.info(`DeviceRepository.findAvailableNearBy called with center: ${JSON.stringify(center)}, radiusInM: ${radiusInM}`);
     const bounds = geohashQueryBounds(
       [center.latitude, center.longitude],
       radiusInM,
@@ -72,6 +77,7 @@ export class DeviceRepository implements IDeviceRepository {
         matchingDocs.set(doc.id, doc.data());
       }
     }
+    logger.info(`DeviceRepository.findAvailableNearBy found ${matchingDocs.size} docs in geohash bounds`);
 
     // Collect unique ownerIds from device docs
     const ownerIdSet = new Set<string>();
@@ -93,6 +99,7 @@ export class DeviceRepository implements IDeviceRepository {
         ownerRoleMap.set(id, data?.role);
       });
     }
+    logger.info(`DeviceRepository.findAvailableNearBy fetched roles for ${ownerIds.length} owners`);
 
     const finalResults = DevicesCollection.create();
     for (const [id, data] of matchingDocs.entries()) {
@@ -127,24 +134,27 @@ export class DeviceRepository implements IDeviceRepository {
         );
       }
     }
-
+    logger.info(`DeviceRepository.findAvailableNearBy returning ${finalResults.length} devices`);
     return finalResults;
   }
 
   async findById(deviceId: DeviceId): Promise<Device | null> {
+    logger.info("DeviceRepository.findById called with deviceId:", deviceId.toString());
     const docRef = this.db.collection("devices").doc(deviceId.toString());
     const snapshot = await docRef.get();
 
     if (!snapshot.exists) {
+      logger.info("DeviceRepository.findById device not found for id:", deviceId.toString());
       return null;
     }
 
     const data = snapshot.data();
     if (!data) {
+      logger.info("DeviceRepository.findById data not found for id:", deviceId.toString());
       return null;
     }
 
-    return Device.create(
+    const device = Device.create(
       DeviceId.create(snapshot.id),
       UserId.create(data.ownerId),
       DeviceToken.create(data.fcmToken),
@@ -155,15 +165,22 @@ export class DeviceRepository implements IDeviceRepository {
       new Date(data.lastUpdatedAt),
       this.clock,
     );
+    logger.info("DeviceRepository.findById returning device:", device);
+    return device;
   }
 
   async nextIdentity(): Promise<DeviceId> {
+    logger.info("DeviceRepository.nextIdentity called");
     const docRef = this.db.collection("devices").doc();
-    return DeviceId.create(docRef.id);
+    const deviceId = DeviceId.create(docRef.id);
+    logger.info("DeviceRepository.nextIdentity returning deviceId:", deviceId.toString());
+    return deviceId;
   }
 
   async delete(deviceId: DeviceId): Promise<void> {
+    logger.info("DeviceRepository.delete called with deviceId:", deviceId.toString());
     const docRef = this.db.collection("devices").doc(deviceId.toString());
     await docRef.delete();
+    logger.info("DeviceRepository.delete completed for deviceId:", deviceId.toString());
   }
 }

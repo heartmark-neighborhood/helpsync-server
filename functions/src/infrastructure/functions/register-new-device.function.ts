@@ -17,7 +17,9 @@ export const registerNewDevice = https.onCall(
       throw new https.HttpsError("unauthenticated", "Unauthorized request");
     }
     try {
-      const db = getFirestore();
+      const projectId = process.env.GCLOUD_PROJECT || process.env.FIREBASE_PROJECT;
+      logger.info("Cloud Function Project ID:", {projectId: projectId});
+      const db = getFirestore("helpsync-db");
       const clock = SystemClock.create();
 
       const deviceRepository = DeviceRepository.create(db, clock);
@@ -35,6 +37,7 @@ export const registerNewDevice = https.onCall(
         clock
       );
 
+      logger.info("Executing RegisterNewDeviceUseCase", {uid: request.auth.uid, command: {userId: userId, deviceToken: deviceToken, location: location}});
       const registeredDevice = await usecase.execute(command);
       logger.info("Device registered successfully", {uid: request.auth.uid, deviceId: registeredDevice.id.value});
       return {
@@ -45,7 +48,7 @@ export const registerNewDevice = https.onCall(
         logger.error("Invalid input data", {uid: request.auth?.uid, errors: error.errors});
         throw new https.HttpsError("invalid-argument", "Invalid input data", error.errors);
       }
-      logger.error("Error registering new device", {uid: request.auth?.uid, error});
+      logger.error("Error registering new device", {uid: request.auth?.uid, errorMessage: error});
       throw new https.HttpsError("internal", "Error registering new device");
     }
   }

@@ -14,6 +14,7 @@ import {z} from "zod";
 import {Location, LocationSchema} from "../../domain/shared/value-object/Location.value.js";
 import {DeviceId} from "../../domain/device/device-id.value.js";
 import {UserInfo, UserInfoDTO, UserInfoSchema} from "../../domain/help-request/user-info.dto.js";
+import {logger} from "firebase-functions";
 
 const HelpRequestDocSchema = z.object({
   id: HelpRequestIdSchema,
@@ -21,9 +22,9 @@ const HelpRequestDocSchema = z.object({
   requesterId: UserIdSchema,
   status: HelpRequestStatusSchema,
   location: LocationSchema,
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  proximityCheckDeadline: z.date(),
+  createdAt: z.instanceof(Timestamp),
+  updatedAt: z.instanceof(Timestamp),
+  proximityCheckDeadline: z.instanceof(Timestamp),
   requesterInfo: UserInfoSchema,
 });
 
@@ -57,6 +58,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
       updatedAt: Timestamp.fromDate(helpRequestData.updatedAt),
       proximityCheckDeadline: Timestamp.fromDate(helpRequestData.proximityCheckDeadline),
     };
+    logger.info("Saving helpRequestDocData:", helpRequestDocData);
     batch.set(helpRequestRef, helpRequestDocData, {merge: true});
 
     const candidates = helpRequestData.candidates;
@@ -70,6 +72,7 @@ export class HelpRequestRepository implements IHelpRequestRepository {
           physicalDescription: candidate.physicalDescription,
           deviceId: candidate.deviceId,
         };
+        logger.info("Saving candidateData:", candidateData);
         batch.set(candidateRef, candidateData, {merge: true});
       });
     }
@@ -107,50 +110,66 @@ export class HelpRequestRepository implements IHelpRequestRepository {
 
 
   async findWithRequesterInfoById(id: HelpRequestId): Promise<HelpRequestWithRequesterInfo | null> {
+    logger.info("HelpRequestRepository.findWithRequesterInfoById called with ID:", {helpRequestId: id.value});
     const helpRequestRef = this.db.collection("helpRequests").doc(id.value);
     const candidateCollectionRef = helpRequestRef.collection("candidates");
     const doc = await helpRequestRef.get();
 
-    if (!doc.exists) return null;
+    if (!doc.exists) {
+      logger.info("Help request document not found for ID:", {helpRequestId: id.value});
+      return null;
+    }
 
-    const helpRequestData = HelpRequestDocSchema.parse(doc.data());
-    const candidatesSnapshot = await candidateCollectionRef.get();
-    const candidatesCollection = CandidatesCollection.create(
-      candidatesSnapshot.docs.map((doc) => {
-        const candidateData = doc.data();
-        const UserInfoDTO = UserInfoSchema.parse(candidateData);
-        const userInfo = UserInfo.fromPersistenceModel(UserInfoDTO);
-        return Candidate.create(
-          userInfo,
-          candidateData.status
-        );
-      })
-    );
+    logger.info("Help request document data:", doc.data());
+    try {
+      const helpRequestData = HelpRequestDocSchema.parse(doc.data());
+      logger.info("Help request document data parsed successfully.");
 
-    const helpRequest = HelpRequest.create(
-      HelpRequestId.create(helpRequestData.id),
-      ProximityVerificationId.create(helpRequestData.proximityVerificationId),
-      UserId.create(helpRequestData.requesterId),
-      helpRequestData.status,
-      Location.create({
-        latitude: helpRequestData.location.latitude,
-        longitude: helpRequestData.location.longitude,
-      }),
-      helpRequestData.createdAt,
-      helpRequestData.updatedAt,
-      candidatesCollection,
-      helpRequestData.proximityCheckDeadline,
-      this.clock
-    );
+      const candidatesSnapshot = await candidateCollectionRef.get();
+      const candidatesCollection = CandidatesCollection.create(
+        candidatesSnapshot.docs.map((doc) => {
+          const candidateData = doc.data();
+          logger.info("Candidate document data:", candidateData);
+          const UserInfoDTO = UserInfoSchema.parse(candidateData);
+          logger.info("Candidate UserInfoDTO parsed successfully.");
+          const userInfo = UserInfo.fromPersistenceModel(UserInfoDTO);
+          return Candidate.create(
+            userInfo,
+            candidateData.status
+          );
+        })
+      );
+      logger.info("Candidates collection created.");
 
+      const helpRequest = HelpRequest.create(
+        HelpRequestId.create(helpRequestData.id),
+        ProximityVerificationId.create(helpRequestData.proximityVerificationId),
+        UserId.create(helpRequestData.requesterId),
+        helpRequestData.status,
+        Location.create({
+          latitude: helpRequestData.location.latitude,
+          longitude: helpRequestData.location.longitude,
+        }),
+        helpRequestData.createdAt.toDate(),
+        helpRequestData.updatedAt.toDate(),
+        candidatesCollection,
+        helpRequestData.proximityCheckDeadline.toDate(),
+        this.clock
+      );
+      logger.info("HelpRequest entity created.");
 
-    const requesterInfoDTO = helpRequestData.requesterInfo;
-    const requester = UserInfo.fromPersistenceModel(requesterInfoDTO);
+      const requesterInfoDTO = helpRequestData.requesterInfo;
+      const requester = UserInfo.fromPersistenceModel(requesterInfoDTO);
+      logger.info("Requester UserInfo entity created.");
 
-    return {
-      helpRequest,
-      requester,
-    };
+      return {
+        helpRequest,
+        requester,
+      };
+    } catch (error) {
+      logger.error("Error parsing help request or candidate data:", {helpRequestId: id.value, errorMessage: error instanceof Error ? error.message : "Unknown error", errorStack: error instanceof Error ? error.stack : "No stack available"});
+      throw error; // Re-throw the error after logging
+    }
   }
 
   async add(requester: User, requestedLocation: Location, requestedDeviceId: DeviceId): Promise<HelpRequest> {

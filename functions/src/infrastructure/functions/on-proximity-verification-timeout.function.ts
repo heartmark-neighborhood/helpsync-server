@@ -5,6 +5,7 @@ import {HelpRequestRepository} from "../firestore/help-request.repository.js";
 import {SystemClock} from "../service/SystemClock.js";
 import {HelpRequestNotifier} from "../notifications/help-request.notifier.js";
 import {FcmGateway} from "../notifications/fcm-gateway.js";
+import {DeviceRepository} from "../firestore/device.repository.js";
 
 export const onProximityVerificationTimeout = https.onRequest(
   async (request, response) => {
@@ -26,14 +27,15 @@ export const onProximityVerificationTimeout = https.onRequest(
       const input = ProximityVerificationTimeoutInputSchema.parse(request.body);
       const command = ProximityVerificationTimeoutCommand.create(input);
 
-      const db = getFirestore();
+      const db = getFirestore("helpsync-db");
       const clock = SystemClock.create();
       const helpRequestRepository = HelpRequestRepository.create(db, clock);
+      const deviceRepository = DeviceRepository.create(db, clock);
 
       const gateway = FcmGateway.create();
       const notifier = HelpRequestNotifier.create(gateway);
 
-      const usecase = ProximityVerificationTimeoutUseCase.create(helpRequestRepository, notifier);
+      const usecase = ProximityVerificationTimeoutUseCase.create(helpRequestRepository, deviceRepository, notifier);
       await usecase.execute(command);
     } catch (error) {
       logger.error("Error processing proximity verification timeout", {error});

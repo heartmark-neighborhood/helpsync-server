@@ -182,7 +182,7 @@ export class HelpRequest {
   }
 
   sentHelpRequest(): HelpRequest {
-    if (this.status !== "matched") {
+    if (this.status !== "matched" && this.status !== "proximity-verification-requested") {
       throw new Error("Invalid state transition");
     }
 

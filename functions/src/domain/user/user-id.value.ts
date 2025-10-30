@@ -22,4 +22,8 @@ export class UserId {
   equals(other: UserId): boolean {
     return this.value === other.value;
   }
+
+  toString(): string {
+    return this.value;
+  }
 }

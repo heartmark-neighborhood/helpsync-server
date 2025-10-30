@@ -17,7 +17,7 @@ export const deleteDevice = https.onCall(async (request) => {
     }
 
     const input = DeleteDeviceInputSchema.parse(request.data);
-    const firestore = getFirestore();
+    const firestore = getFirestore("helpsync-db");
     const deviceRepository = DeviceRepository.create(
       firestore,
       SystemClock.create()

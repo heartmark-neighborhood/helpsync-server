@@ -24,6 +24,7 @@ export class FcmGateway {
     };
 
     try {
+      logger.info("Sending notification", {deviceToken: deviceToken, data});
       await admin.messaging().send(message);
       logger.info("Notification sent successfully", {deviceToken: deviceToken, data});
     } catch (error) {

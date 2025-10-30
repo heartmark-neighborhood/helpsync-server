@@ -11,7 +11,7 @@ export const updateDeviceLocation = https.onCall(async (request) => {
     throw new https.HttpsError("unauthenticated", "Unauthenticated request");
   }
 
-  const firestore = getFirestore();
+  const firestore = getFirestore("helpsync-db");
   const clock = SystemClock.create();
   const repository = DeviceRepository.create(firestore, clock);
 
