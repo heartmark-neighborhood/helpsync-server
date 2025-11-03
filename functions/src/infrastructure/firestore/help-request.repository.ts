@@ -13,7 +13,7 @@ import {Candidate} from "../../domain/help-request/candidate.entity.js";
 import {z} from "zod";
 import {Location, LocationSchema} from "../../domain/shared/value-object/Location.value.js";
 import {DeviceId} from "../../domain/device/device-id.value.js";
-import {UserInfo, UserInfoDTO, UserInfoSchema} from "../../domain/help-request/user-info.dto.js";
+import {UserInfo, UserInfoSchema} from "../../domain/help-request/user-info.dto.js";
 import {logger} from "firebase-functions";
 
 const HelpRequestDocSchema = z.object({
@@ -65,14 +65,14 @@ export class HelpRequestRepository implements IHelpRequestRepository {
     if ( candidates && candidates.length > 0 ) {
       candidates.forEach((candidate) => {
         const candidateRef = helpRequestRef.collection("candidates").doc(candidate.id);
-        const candidateData: UserInfoDTO = {
+        const candidateData = {
           id: candidate.id,
           nickname: candidate.nickname,
           iconUrl: candidate.iconUrl,
           physicalDescription: candidate.physicalDescription,
           deviceId: candidate.deviceId,
+          status: candidate.status, // Add status here
         };
-        logger.info("Saving candidateData:", candidateData);
         batch.set(candidateRef, candidateData, {merge: true});
       });
     }
