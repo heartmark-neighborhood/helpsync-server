@@ -1,24 +1,29 @@
+import {TestClock} from "../../../__test__/fake/test-clock.service.js";
+import {Location} from "../shared/value-object/Location.value.js";
+import {DeviceToken} from "../device/device-token.value.js";
+import {UserId} from "../user/user-id.value.js";
+import {Device} from "../device/device.entity.js";
 import {MemoryHelpRequestRepository} from "../../../__test__/fake/memory-help-request.repository.js";
+import {MemoryDeviceRepository} from "../../../__test__/fake/memory-device.repository.js";
 import {DeviceId} from "../device/device-id.value.js";
 import {ProximityVerificationTimeoutCommand, ProximityVerificationTimeoutUseCase} from "./on-proximity-verification-timeout.usecase.js";
 import {UserInfo} from "./user-info.dto.js";
 import {IHelpRequestNotifier} from "./service/i-help-request.notifier.js";
-
 class DummyHelpRequestNotifier implements IHelpRequestNotifier {
-  private notifications: { deviceId: string }[] = [];
-  async notifyRequesterOfMatches(deviceId: DeviceId, _requesterInfo: UserInfo): Promise<void> {
+  private notifications: { deviceToken: string }[] = [];
+  async notifyRequesterOfMatches(deviceToken: DeviceToken, _requesterInfo: UserInfo): Promise<void> {
     // Dummy implementation for testing
-    this.notifications.push({deviceId: deviceId.value});
+    this.notifications.push({deviceToken: deviceToken.value});
     return Promise.resolve();
   }
 
-  async notifySupporterOfMatches(deviceId: DeviceId, _candidatesInfo: UserInfo[]): Promise<void> {
+  async notifySupporterOfMatches(deviceToken: DeviceToken, _candidatesInfo: UserInfo[]): Promise<void> {
     // Dummy implementation for testing
-    this.notifications.push({deviceId: deviceId.value});
+    this.notifications.push({deviceToken: deviceToken.value});
     return Promise.resolve();
   }
 
-  getNotifications(): { deviceId: string }[] {
+  getNotifications(): { deviceToken: string }[] {
     return this.notifications;
   }
 }
@@ -26,8 +31,17 @@ class DummyHelpRequestNotifier implements IHelpRequestNotifier {
 describe("近接確認応答の制限時間超過", () => {
   it("ヘルプ要請のステータスを更新し、通知を送信する", async () => {
     const helpRequestRepository = new MemoryHelpRequestRepository();
+    const deviceRepository = new MemoryDeviceRepository();
+    deviceRepository.save(Device.create(
+      DeviceId.create("requester-device-id"),
+      UserId.create("requester-id"),
+      DeviceToken.create("dummy-requester-device-token"),
+      Location.create({latitude: 0, longitude: 0}),
+      new Date(),
+      new TestClock(),
+    ));
     const helpRequestNotifier = new DummyHelpRequestNotifier();
-    const useCase = ProximityVerificationTimeoutUseCase.create(helpRequestRepository, helpRequestNotifier);
+    const useCase = ProximityVerificationTimeoutUseCase.create(helpRequestRepository, deviceRepository, helpRequestNotifier);
 
     const initHelpRequest = await helpRequestRepository.getForTimeoutTestingWithCandidates();
 
@@ -46,7 +60,7 @@ describe("近接確認応答の制限時間超過", () => {
     expect(helpRequest.candidatesCollection.withStatus("help-request-notified").all.length).toBe(2);
     expect(helpRequest.status).toBe("sent");
     expect(notifications.length).toBe(3);
-    expect(notifications[0].deviceId).toBe("supporter1-device1-id");
-    expect(notifications[1].deviceId).toBe("supporter2-device1-id");
+    expect(notifications[0].deviceToken).toBe("supporter1-device-token");
+    expect(notifications[1].deviceToken).toBe("supporter2-device-token");
   });
 });

@@ -88,13 +88,13 @@ export class CreateHelpRequestUseCase {
     }
 
     const nearByDeviceUniqueLatest = nearByDevice.toUniqueLatest();
-    logger.info("Unique latest nearby devices:", {count: nearByDeviceUniqueLatest.length});
+    logger.info("Unique latest nearby devices:", {count: nearByDeviceUniqueLatest.length, deviceIds: nearByDeviceUniqueLatest.all.map((d) => d.id.value)});
 
     const userIds = nearByDeviceUniqueLatest.all.map((device) => device.ownerId);
     logger.info("User IDs from nearby devices:", {userIds: userIds.map((id) => id.value)});
 
     const users = await this.userRepository.findManyByIds(userIds);
-    logger.info("Users found for nearby devices:", {count: users.length});
+    logger.info("Users found for nearby devices:", {count: users.length, userIds: users.map((u) => u.id.value)});
 
     let candidates = CandidatesCollection.create();
     for (const user of users) {

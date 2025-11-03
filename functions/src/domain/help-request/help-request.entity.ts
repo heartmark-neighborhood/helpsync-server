@@ -153,8 +153,10 @@ export class HelpRequest {
     }
 
     const updatedCandidates = this.candidatesCollection.timeoutProximityVerification();
+    console.log("timeoutProximityVerification: updatedCandidates status:", updatedCandidates.all.map((c) => c.status));
+    console.log("timeoutProximityVerification: existsByStatus(\"proximity-verification-succeeded\"):", updatedCandidates.existsByStatus("proximity-verification-succeeded"));
     if (updatedCandidates.existsByStatus("proximity-verification-succeeded")) {
-      return new HelpRequest(
+      const newHelpRequest = new HelpRequest(
         this.id,
         this.proximityVerificationId,
         this.requesterId,
@@ -166,8 +168,10 @@ export class HelpRequest {
         this.proximityCheckDeadline,
         this.clock
       );
+      console.log("timeoutProximityVerification: Returning HelpRequest with status:", newHelpRequest.status);
+      return newHelpRequest;
     }
-    return new HelpRequest(
+    const newHelpRequest = new HelpRequest(
       this.id,
       this.proximityVerificationId,
       this.requesterId,
@@ -179,10 +183,12 @@ export class HelpRequest {
       this.proximityCheckDeadline,
       this.clock
     );
+    console.log("timeoutProximityVerification: Returning HelpRequest with status:", newHelpRequest.status);
+    return newHelpRequest;
   }
 
   sentHelpRequest(): HelpRequest {
-    if (this.status !== "matched" && this.status !== "proximity-verification-requested") {
+    if (this.status !== "matched") {
       throw new Error("Invalid state transition");
     }
 

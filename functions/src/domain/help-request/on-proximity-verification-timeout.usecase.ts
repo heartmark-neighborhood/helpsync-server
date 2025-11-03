@@ -52,6 +52,7 @@ export class ProximityVerificationTimeoutUseCase {
       await this.helpRequestNotifier.notifyRequesterOfMatches(device.deviceToken, requester);
       logger.info("Notified requester of matches for candidate:", {candidateId: candidate.userInfo.id.value});
     }
+    logger.info("Candidates transitioned to 'help-request-notified' status.");
 
     const requesterDevice = await this.deviceRepository.findById(requester.deviceId);
     if (!requesterDevice) {
@@ -66,6 +67,7 @@ export class ProximityVerificationTimeoutUseCase {
     logger.info("Notified supporter of matches.");
 
     const sentHelpRequest = timeoutedHelpRequest.sentHelpRequest();
+    logger.info("Help request transitioned to 'sent' status.");
     await this.helpRequestRepository.save(sentHelpRequest);
     logger.info("Help request saved after sending.");
   }

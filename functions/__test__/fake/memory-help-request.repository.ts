@@ -17,6 +17,9 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
   constructor(private clock: TestClock = new TestClock()) {}
 
   async save(helpRequest: HelpRequest): Promise<HelpRequest> {
+    console.log("MemoryHelpRequestRepository.save called with helpRequest ID:", helpRequest.id.value);
+    console.log("MemoryHelpRequestRepository.save: helpRequest status:", helpRequest.status);
+    console.log("CandidatesCollection in saved helpRequest:", helpRequest.candidatesCollection.all.map((c) => ({id: c.userInfo.id.value, status: c.status})));
     const index = this.helpRequests.findIndex((hr) => hr.id.equals(helpRequest.id));
     if (index !== -1) {
       this.helpRequests[index] = helpRequest;
@@ -30,12 +33,14 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
     const helpRequest = this.helpRequests.find((hr) => hr.id.equals(id));
     if (!helpRequest) return null;
 
+    console.log("MemoryHelpRequestRepository.findWithRequesterInfoById: helpRequest status:", helpRequest.status);
+
     const requesterInfo: UserInfo = {
       id: UserId.create("requester-id"), // Placeholder, should be fetched from User entity
       nickname: "Test User", // Placeholder, should be fetched from User entity
       iconUrl: "https://example.com/icon.png", // Placeholder, should be fetched from User entity
       physicalDescription: "Test User Description", // Placeholder, should be fetched from User entity
-      deviceId: DeviceId.create("device-id"), // Placeholder, should be fetched from Device entity
+      deviceId: DeviceId.create("requester-device-id"), // Placeholder, should be fetched from Device entity
     };
 
     return {
@@ -80,6 +85,7 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
           deviceId: DeviceId.create("supporter2-device1-id"),
         }, "proximity-verification-succeeded"),
     ]);
+    console.log("getForTimeoutTestingWithCandidates: Initial candidates:", candidates.all.map((c) => ({id: c.userInfo.id.value, status: c.status})));
     const helpRequest = HelpRequest.create(
       HelpRequestId.create(),
       ProximityVerificationId.create(),
