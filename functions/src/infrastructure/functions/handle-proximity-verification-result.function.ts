@@ -5,11 +5,14 @@ import {HelpRequestRepository} from "../firestore/help-request.repository.js";
 import {SystemClock} from "../service/SystemClock.js";
 
 export const handleProximityVerificationResult = https.onCall(async (request) => {
+  logger.info("Proximity verification function called", {auth: request.auth, data: request.data});
   if (!request.auth) {
     throw new https.HttpsError("unauthenticated", "Unauthorized request");
   }
 
+
   const validationResult = HandleProximityVerificationResultInputSchema.safeParse(request.data);
+  logger.info("Validation result", {validationResult});
   if (!validationResult.success) {
     throw new https.HttpsError("invalid-argument", `Invalid request data: ${validationResult.error.message}`);
   }
@@ -22,6 +25,7 @@ export const handleProximityVerificationResult = https.onCall(async (request) =>
     const repository = HelpRequestRepository.create(db, clock);
 
     const command = HandleProximityVerificationResultCommand.create(validationResult.data);
+    logger.info("Executing HandleProximityVerificationResultUseCase with command", {command});
     const usecase = new HandleProximityVerificationResultUseCase(repository);
     await usecase.execute(command);
     console.log("Proximity verification result processed successfully.");
