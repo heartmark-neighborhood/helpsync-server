@@ -1,4 +1,3 @@
-import {DeviceId} from "../../device/device-id.value.js";
 import {DeviceToken} from "../../device/device-token.value.js";
 import {UserInfo} from "../user-info.dto.js";
 

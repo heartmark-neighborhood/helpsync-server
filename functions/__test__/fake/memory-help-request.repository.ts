@@ -49,6 +49,7 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
     };
   }
 
+
   async add(requester: User, location: Location): Promise<HelpRequest> {
     const newHelpRequest = HelpRequest.create(
       HelpRequestId.create(),
@@ -86,6 +87,41 @@ export class MemoryHelpRequestRepository implements IHelpRequestRepository {
         }, "proximity-verification-succeeded"),
     ]);
     console.log("getForTimeoutTestingWithCandidates: Initial candidates:", candidates.all.map((c) => ({id: c.userInfo.id.value, status: c.status})));
+    const helpRequest = HelpRequest.create(
+      HelpRequestId.create(),
+      ProximityVerificationId.create(),
+      UserId.create("requester-id"),
+      "proximity-verification-requested",
+      Location.create({latitude: 35.6895, longitude: 139.6917}), // Example coordinates
+      this.clock.now(),
+      this.clock.now(),
+      candidates,
+      this.clock.now(),
+      this.clock
+    );
+    this.helpRequests.push(helpRequest);
+    return helpRequest;
+  }
+
+  async getForTimeoutTestingWithoutSuccessfulCandidates(): Promise<HelpRequest> {
+    const candidates = CandidatesCollection.create([
+      Candidate.create(
+        {
+          id: UserId.create("supporter1"),
+          nickname: "Supporter 1",
+          iconUrl: "https://example.com/supporter1.png",
+          physicalDescription: "Supporter 1 Description",
+          deviceId: DeviceId.create("supporter1-device1-id"),
+        }, "proximity-verification-failed"),
+      Candidate.create(
+        {
+          id: UserId.create("supporter2"),
+          nickname: "Supporter 2",
+          iconUrl: "https://example.com/supporter2.png",
+          physicalDescription: "Supporter 2 Description",
+          deviceId: DeviceId.create("supporter2-device1-id"),
+        }, "proximity-verification-failed"),
+    ]);
     const helpRequest = HelpRequest.create(
       HelpRequestId.create(),
       ProximityVerificationId.create(),

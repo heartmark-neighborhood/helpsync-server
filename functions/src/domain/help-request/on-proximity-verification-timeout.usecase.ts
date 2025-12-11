@@ -64,7 +64,13 @@ export class ProximityVerificationTimeoutUseCase {
       requesterDevice.deviceToken,
       candidatesToNotify.toUserInfos()
     );
-    logger.info("Notified supporter of matches.");
+    logger.info(`Notified supporter of matches. ${candidatesToNotify.length} candidates notified.`);
+
+    if (timeoutedHelpRequest.status === "failed") {
+      logger.info("Help request has failed status after timeout. No further action taken.");
+      await this.helpRequestRepository.save(timeoutedHelpRequest);
+      return;
+    }
 
     const sentHelpRequest = timeoutedHelpRequest.sentHelpRequest();
     logger.info("Help request transitioned to 'sent' status.");
