@@ -64,7 +64,7 @@ describe("近接確認応答の制限時間超過", () => {
     expect(notifications[1].deviceToken).toBe("supporter2-device-token");
   });
 
-  it("近接確認に成功した候補者がいない場合、ヘルプ要請は失敗ステータスとなり、通知は送信されない", async () => {
+  it("近接確認に成功した候補者がいない場合、ヘルプ要請は失敗ステータスとなり、ヘルプマーク所持者にのみ通知が送信される", async () => {
     const helpRequestRepository = new MemoryHelpRequestRepository();
     const deviceRepository = new MemoryDeviceRepository();
     const helpRequestNotifier = new DummyHelpRequestNotifier();
@@ -84,6 +84,7 @@ describe("近接確認応答の制限時間超過", () => {
     const {helpRequest} = updatedHelpRequestInfo;
 
     expect(helpRequest.status).toBe("failed");
-    expect(notifications.length).toBe(0);
+    expect(notifications.length).toBe(1);
+    expect(notifications[0].deviceToken).toBe("dummy-requester-device-token");
   });
 });

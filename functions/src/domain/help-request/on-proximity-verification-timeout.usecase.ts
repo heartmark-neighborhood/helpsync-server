@@ -39,12 +39,6 @@ export class ProximityVerificationTimeoutUseCase {
     const timeoutedHelpRequest = helpRequest.timeoutProximityVerification();
     logger.info("Help request proximity verification timeouted.");
 
-    if (timeoutedHelpRequest.status === "failed") {
-      logger.info("Help request has failed status after timeout. No further action taken.");
-      await this.helpRequestRepository.save(timeoutedHelpRequest);
-      return;
-    }
-
     const candidatesToNotify = timeoutedHelpRequest.candidatesCollection.withStatus("proximity-verification-succeeded");
     logger.info("Candidates to notify with 'proximity-verification-succeeded' status:", {count: candidatesToNotify.length});
 
@@ -71,6 +65,12 @@ export class ProximityVerificationTimeoutUseCase {
       candidatesToNotify.toUserInfos()
     );
     logger.info(`Notified supporter of matches. ${candidatesToNotify.length} candidates notified.`);
+
+    if (timeoutedHelpRequest.status === "failed") {
+      logger.info("Help request has failed status after timeout. No further action taken.");
+      await this.helpRequestRepository.save(timeoutedHelpRequest);
+      return;
+    }
 
     const sentHelpRequest = timeoutedHelpRequest.sentHelpRequest();
     logger.info("Help request transitioned to 'sent' status.");
