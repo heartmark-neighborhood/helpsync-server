@@ -63,4 +63,27 @@ describe("近接確認応答の制限時間超過", () => {
     expect(notifications[0].deviceToken).toBe("supporter1-device-token");
     expect(notifications[1].deviceToken).toBe("supporter2-device-token");
   });
+
+  it("近接確認に成功した候補者がいない場合、ヘルプ要請は失敗ステータスとなり、通知は送信されない", async () => {
+    const helpRequestRepository = new MemoryHelpRequestRepository();
+    const deviceRepository = new MemoryDeviceRepository();
+    const helpRequestNotifier = new DummyHelpRequestNotifier();
+    const useCase = ProximityVerificationTimeoutUseCase.create(helpRequestRepository, deviceRepository, helpRequestNotifier);
+
+    const initHelpRequest = await helpRequestRepository.getForTimeoutTestingWithoutSuccessfulCandidates();
+
+    const command = ProximityVerificationTimeoutCommand.create({helpRequestId: initHelpRequest.id.value});
+    await useCase.execute(command);
+
+    const notifications = helpRequestNotifier.getNotifications();
+
+    const updatedHelpRequestInfo = await helpRequestRepository.findWithRequesterInfoById(initHelpRequest.id);
+    if (!updatedHelpRequestInfo) {
+      throw new Error("Help request not found after timeout");
+    }
+    const {helpRequest} = updatedHelpRequestInfo;
+
+    expect(helpRequest.status).toBe("failed");
+    expect(notifications.length).toBe(0);
+  });
 });
